@@ -12,6 +12,7 @@ import {
   X,
   Sparkles,
 } from 'lucide-react';
+import { SafeImage } from '../../components/common/SafeImage';
 
 export const AdminHiddenGemsPage: React.FC = () => {
   const [gems, setGems] = useState<any[]>([]);
@@ -207,7 +208,7 @@ export const AdminHiddenGemsPage: React.FC = () => {
               >
                 <div>
                   <div className="relative h-44 w-full">
-                    <img src={photoUrl} alt={gem.name} className="w-full h-full object-cover" />
+                    <SafeImage src={photoUrl} alt={gem.name} className="w-full h-full object-cover" category="gem" />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
                     <span className="absolute top-2.5 left-2.5 bg-slate-950/80 backdrop-blur-xs text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded-md border border-amber-500/20">
                       {gem.city_name || `City #${gem.city_id}`}

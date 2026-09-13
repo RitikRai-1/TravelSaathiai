@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import { SafeImage } from '../../components/common/SafeImage';
 import {
   Briefcase,
   Hotel,
@@ -308,10 +309,11 @@ export const BusinessDashboardPage: React.FC = () => {
                 {data.hotels.map((hotel) => (
                   <div key={hotel.id} className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
                     <div className="h-44 relative overflow-hidden bg-slate-100">
-                      <img
+                      <SafeImage
                         src={hotel.photos?.[0] || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80'}
                         alt={hotel.name}
                         className="w-full h-full object-cover"
+                        category="hotel"
                       />
                       <div className="absolute top-3 right-3">
                         {getStatusBadge(hotel.approval_status)}
@@ -366,10 +368,11 @@ export const BusinessDashboardPage: React.FC = () => {
                 {data.restaurants.map((rest) => (
                   <div key={rest.id} className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
                     <div className="h-44 relative overflow-hidden bg-slate-100">
-                      <img
+                      <SafeImage
                         src={rest.photos?.[0] || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80'}
                         alt={rest.name}
                         className="w-full h-full object-cover"
+                        category="restaurant"
                       />
                       <div className="absolute top-3 right-3">
                         {getStatusBadge(rest.approval_status)}

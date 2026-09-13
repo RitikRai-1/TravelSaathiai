@@ -6,6 +6,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { TaxiBookingModal } from '../../components/booking/TaxiBookingModal';
 import { IndianMonumentsSkyline } from '../../components/common/IndianMonumentsSkyline';
+import { SafeImage } from '../../components/common/SafeImage';
 import {
   Sparkles,
   BookmarkCheck,
@@ -120,8 +121,9 @@ export const TripDetailPage: React.FC = () => {
         }
       });
 
-      // Fetch restaurants for destination city
-      api.getRestaurants({ city_id: trip.city.id }).then((res) => {
+      // Fetch restaurants for destination city matching food preference
+      const foodTypeParam = trip.foodPreference === 'veg' ? 'veg' : trip.foodPreference === 'non_veg' ? 'non_veg' : undefined;
+      api.getRestaurants({ city_id: trip.city.id, food_type: foodTypeParam }).then((res) => {
         if (res.success && res.data && res.data.length > 0) {
           setCityRestaurants(res.data);
         }
@@ -537,14 +539,31 @@ export const TripDetailPage: React.FC = () => {
     // Filter dining pool strictly according to trip foodPreference
     const isVeg = trip.foodPreference === 'veg';
     const isNonVeg = trip.foodPreference === 'non_veg';
-    const filteredDining = rawDining.filter((r: any) => {
+    let filteredDining = rawDining.filter((r: any) => {
       const ft = r.food_type || 'both';
-      if (isVeg) return ft === 'veg' || ft === 'both';
+      if (isVeg) return ft === 'veg';
       if (isNonVeg) return ft === 'non_veg' || ft === 'both';
       return true;
     });
 
-    const allDining = filteredDining.length > 0 ? filteredDining : rawDining;
+    if (isVeg && filteredDining.length === 0) {
+      // Exclude strict non-veg restaurants completely
+      filteredDining = rawDining.filter((r: any) => (r.food_type || 'both') !== 'non_veg');
+    }
+
+    const allDining = filteredDining.length > 0 ? filteredDining : [
+      {
+        id: 201,
+        name: `${trip.city.name} Pure Veg Heritage Rasoi`,
+        cuisine: 'Pure Veg Regional & North Indian Thali',
+        food_type: 'veg',
+        rating: 4.8,
+        avg_cost_for_two: 500,
+        photos: ['https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=1000&q=80'],
+        popular_dishes: ['Pure Veg Thali', 'Dal Makhani', 'Stuffed Kulcha', 'Kesar Kheer'],
+        description: 'Pure vegetarian dining hub celebrating authentic spices, farm-fresh ingredients, and desi ghee preparations.'
+      }
+    ];
 
     const idx = slot === 'lunch' ? ((dayNumber - 1) * 2) % allDining.length : ((dayNumber - 1) * 2 + 1) % allDining.length;
     const dining = allDining[idx] || allDining[0];
@@ -568,12 +587,13 @@ export const TripDetailPage: React.FC = () => {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Header Banner */}
-      <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200/80 dark:border-slate-700 shadow-sm overflow-hidden">
         <div className="relative h-64 sm:h-80 w-full">
-          <img
+          <SafeImage
             src={trip.city.coverImage}
             alt={trip.title}
             className="w-full h-full object-cover"
+            category="city"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent"></div>
 
@@ -784,7 +804,7 @@ export const TripDetailPage: React.FC = () => {
               return (
                 <div key={hotel.id || idx} className={`bg-white rounded-3xl border-2 overflow-hidden flex flex-col transition shadow-sm hover:shadow-lg ${isSelected ? 'border-[#FF6B35] ring-2 ring-[#FF6B35]/20' : 'border-slate-200 hover:border-[#2DD4BF]'}`}>
                   <div className="relative h-52 w-full">
-                    <img src={photo} alt={hotel.name} className="w-full h-full object-cover" />
+                    <SafeImage src={photo} alt={hotel.name} className="w-full h-full object-cover" category="hotel" />
                     <div className="absolute top-3 left-3 bg-[#0F766E] text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm flex items-center space-x-1">
                       <Sparkles className="w-3 h-3 text-[#2DD4BF]" />
                       <span>{hotel.ai_badge || 'AI Recommended'}</span>
@@ -1061,6 +1081,28 @@ export const TripDetailPage: React.FC = () => {
           </div>
         </div>
 
+        {/* Exact Mathematical Formula Banner (Hotel + Food + Transport + Activities + Other = Total) */}
+        <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-200 text-xs">
+          <span className="font-bold text-emerald-900 block mb-1">
+            Budget Calculation Formula (Hotel + Food + Transport + Activities + Other = Total Estimated Cost):
+          </span>
+          <div className="flex flex-wrap items-center gap-1.5 font-mono text-emerald-800">
+            <span className="bg-white px-2 py-0.5 rounded border border-emerald-200">Hotel: ₹{(budget.hotelCost || 0).toLocaleString('en-IN')}</span>
+            <span>+</span>
+            <span className="bg-white px-2 py-0.5 rounded border border-emerald-200">Food: ₹{(budget.foodCost || 0).toLocaleString('en-IN')}</span>
+            <span>+</span>
+            <span className="bg-white px-2 py-0.5 rounded border border-emerald-200">Transport: ₹{((budget.transportCost || 0) + (budget.taxiCost || 0)).toLocaleString('en-IN')}</span>
+            <span>+</span>
+            <span className="bg-white px-2 py-0.5 rounded border border-emerald-200">Activities: ₹{((budget.entryFeesCost || 0) + (budget.activitiesCost || 0)).toLocaleString('en-IN')}</span>
+            <span>+</span>
+            <span className="bg-white px-2 py-0.5 rounded border border-emerald-200">Other: ₹{(budget.miscCost || 0).toLocaleString('en-IN')}</span>
+            <span>=</span>
+            <span className="font-bold bg-[#0F766E] text-white px-2.5 py-0.5 rounded shadow-xs">
+              Total: ₹{budget.estimatedTotalCost.toLocaleString('en-IN')}
+            </span>
+          </div>
+        </div>
+
         {/* 7 Category Breakdown Tiles (SIH Section 4) */}
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 pt-2">
           <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-100">
@@ -1305,7 +1347,7 @@ export const TripDetailPage: React.FC = () => {
                   <div key={idx} className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-md transition">
                     <div>
                       <div className="relative h-48 w-full">
-                        <img src={photo} alt={hotel.name} className="w-full h-full object-cover" />
+                        <SafeImage src={photo} alt={hotel.name} className="w-full h-full object-cover" category="hotel" />
                         <div className="absolute top-3 left-3 bg-[#0F766E] text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm flex items-center space-x-1">
                           <HotelIcon className="w-3 h-3" />
                           <span>Recommended Stay</span>
@@ -1431,7 +1473,7 @@ export const TripDetailPage: React.FC = () => {
                   <div key={idx} className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-md transition">
                     <div>
                       <div className="relative h-48 w-full">
-                        <img src={photo} alt={dining.name} className="w-full h-full object-cover" />
+                        <SafeImage src={photo} alt={dining.name} className="w-full h-full object-cover" category="restaurant" />
                         <div className="absolute top-3 left-3 bg-amber-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm flex items-center space-x-1">
                           <Utensils className="w-3 h-3" />
                           <span>{dining.cuisine || 'Regional Special'}</span>
@@ -1538,7 +1580,7 @@ export const TripDetailPage: React.FC = () => {
                   <div key={idx} className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-md transition">
                     <div>
                       <div className="relative h-48 w-full">
-                        <img src={photo} alt={gem.name} className="w-full h-full object-cover" />
+                        <SafeImage src={photo} alt={gem.name} className="w-full h-full object-cover" category="gem" />
                         <div className="absolute top-3 left-3 bg-teal-700 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm flex items-center space-x-1">
                           <Sparkles className="w-3 h-3 text-[#F9C74F]" />
                           <span>Hidden Gem</span>
@@ -1713,10 +1755,11 @@ export const TripDetailPage: React.FC = () => {
                               {/* Thumbnail */}
                               {stop.imageUrl && (
                                 <div className="relative w-full md:w-44 h-32 rounded-xl overflow-hidden shrink-0">
-                                  <img
+                                  <SafeImage
                                     src={stop.imageUrl}
                                     alt={stop.title}
                                     className="w-full h-full object-cover"
+                                    category="place"
                                   />
                                   <div className="absolute top-2 left-2 w-6 h-6 rounded-full bg-[#0B192C]/80 text-white font-bold text-xs flex items-center justify-center backdrop-blur-xs">
                                     {stop.stopOrder}
@@ -1881,10 +1924,11 @@ export const TripDetailPage: React.FC = () => {
 
                               <div className="flex flex-col sm:flex-row gap-4 items-start">
                                 <div className="relative w-full sm:w-44 h-32 rounded-xl overflow-hidden shrink-0">
-                                  <img
+                                  <SafeImage
                                     src={lunch.photo}
                                     alt={lunch.dining.name}
                                     className="w-full h-full object-cover"
+                                    category="food"
                                   />
                                 </div>
 
@@ -1967,10 +2011,11 @@ export const TripDetailPage: React.FC = () => {
 
                               <div className="flex flex-col sm:flex-row gap-4 items-start">
                                 <div className="relative w-full sm:w-44 h-32 rounded-xl overflow-hidden shrink-0">
-                                  <img
+                                  <SafeImage
                                     src={dinner.photo}
                                     alt={dinner.dining.name}
                                     className="w-full h-full object-cover"
+                                    category="food"
                                   />
                                 </div>
 

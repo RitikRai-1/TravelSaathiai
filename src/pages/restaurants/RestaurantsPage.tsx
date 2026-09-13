@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { api } from '../../services/api';
 import { Restaurant, City } from '../../types';
 import { IndianMonumentsSkyline } from '../../components/common/IndianMonumentsSkyline';
+import { SafeImage } from '../../components/common/SafeImage';
 import { Utensils, Star, MapPin, Search, ArrowRight } from 'lucide-react';
 
 export const RestaurantsPage: React.FC = () => {
@@ -162,10 +163,11 @@ export const RestaurantsPage: React.FC = () => {
             >
               <div>
                 <div className="relative h-52 overflow-hidden">
-                  <img
+                  <SafeImage
                     src={rest.photos?.[0] || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80'}
                     alt={rest.name}
                     className="w-full h-full object-cover"
+                    category="restaurant"
                   />
                   <div className="absolute top-3 left-3 flex flex-col gap-1.5">
                     <span className="bg-slate-900/80 backdrop-blur-xs text-white text-xs font-bold px-2.5 py-1 rounded-full">

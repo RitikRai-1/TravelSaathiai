@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { IndianMonumentsSkyline } from '../../components/common/IndianMonumentsSkyline';
+import { SafeImage } from '../../components/common/SafeImage';
 
 const ALL_CATEGORIES = [
   'All',
@@ -336,10 +337,11 @@ export const ExplorePage: React.FC = () => {
                     <div>
                       {/* Image Banner */}
                       <div className="relative h-52 overflow-hidden">
-                        <img
+                        <SafeImage
                           src={place.cover_image}
                           alt={place.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                          category="place"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
 

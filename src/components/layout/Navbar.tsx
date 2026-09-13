@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import { api } from '../../services/api';
 import { TravelSaathiLogo } from '../common/TravelSaathiLogo';
 import { LanguageSelector } from '../common/LanguageSelector';
@@ -22,10 +23,13 @@ import {
   BookmarkCheck,
   ChevronDown,
   Settings as SettingsIcon,
+  Sun,
+  Moon,
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
   const { user, logout, isSuperAdmin, isBusinessOwner } = useAuth();
+  const { theme, toggleTheme, setTheme } = useTheme();
   const { t } = useLanguage();
   const location = useLocation();
   const navigate = useNavigate();
@@ -63,16 +67,16 @@ export const Navbar: React.FC = () => {
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-[#0B192C]/95 backdrop-blur-md border-b border-[#0F766E]/40 shadow-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
-          {/* Logo & Tagline */}
-          <Link to="/" className="group">
-            <TravelSaathiLogo variant="white" />
+    <header className="sticky top-0 z-50 w-full max-w-full bg-[#0B192C] text-slate-100 border-b border-[#0F766E]/40 shadow-md">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 sm:h-20">
+          {/* Logo */}
+          <Link to="/" className="group flex-shrink-0">
+            <TravelSaathiLogo variant="white" size="sm" className="sm:scale-100" />
           </Link>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center space-x-1 xl:space-x-2">
+          <nav className="hidden lg:flex items-center space-x-1 xl:space-x-1.5 flex-nowrap overflow-hidden">
             {navLinks.map((link) => {
               const Icon = link.icon;
               const isActive = location.pathname === link.path;
@@ -80,55 +84,75 @@ export const Navbar: React.FC = () => {
                 <Link
                   key={link.name}
                   to={link.path}
-                  className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl text-sm font-semibold transition-all duration-150 ${
+                  className={`flex items-center space-x-1 px-2.5 py-1.5 xl:px-3 xl:py-2 rounded-xl text-xs xl:text-sm font-semibold whitespace-nowrap transition-all duration-150 flex-shrink-0 ${
                     link.highlight
-                      ? 'bg-gradient-to-r from-[#FF6B35] to-[#EA580C] hover:brightness-110 text-white shadow-md shadow-[#FF6B35]/30 hover:scale-[1.02]'
+                      ? 'bg-gradient-to-r from-[#FF6B35] to-[#EA580C] hover:brightness-110 text-white shadow-md shadow-[#FF6B35]/30'
                       : isActive
                       ? 'text-[#2DD4BF] bg-[#0F766E]/50 font-bold border border-[#2DD4BF]/50'
                       : 'text-slate-200 hover:text-[#2DD4BF] hover:bg-[#1E3E62]/50'
                   }`}
                 >
-                  {Icon && <Icon className={`w-4 h-4 ${link.highlight ? 'text-white' : 'text-[#2DD4BF]'}`} />}
-                  <span>{link.name}</span>
+                  {Icon && <Icon className={`w-3.5 h-3.5 xl:w-4 xl:h-4 ${link.highlight ? 'text-white' : 'text-[#2DD4BF]'}`} />}
+                  <span className="whitespace-nowrap">{link.name}</span>
                 </Link>
               );
             })}
           </nav>
 
-          {/* User Actions & Auth Profile */}
-          <div className="hidden lg:flex items-center space-x-2 xl:space-x-3">
-            {/* Global Multilingual Language Selector */}
+          {/* Controls: Theme, Language, Profile/Auth */}
+          <div className="hidden lg:flex items-center space-x-2 xl:space-x-2.5 flex-shrink-0">
+            {/* White / Dark Theme Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-xl border border-[#0F766E]/50 hover:border-[#2DD4BF] bg-[#07101C]/80 hover:bg-[#1E3E62]/50 text-xs font-semibold text-slate-200 hover:text-white transition whitespace-nowrap"
+              title={`Switch to ${theme === 'dark' ? 'White' : 'Dark'} theme`}
+              aria-label="Toggle Theme"
+            >
+              {theme === 'dark' ? (
+                <>
+                  <Sun className="w-3.5 h-3.5 text-amber-400" />
+                  <span className="whitespace-nowrap">White</span>
+                </>
+              ) : (
+                <>
+                  <Moon className="w-3.5 h-3.5 text-[#2DD4BF]" />
+                  <span className="whitespace-nowrap">Dark</span>
+                </>
+              )}
+            </button>
+
+            {/* Language Selector */}
             <LanguageSelector />
 
             {/* Quick Settings Shortcut */}
             <Link
               to="/settings"
               title="Settings & Regional Preferences"
-              className="p-2 text-slate-300 hover:text-[#2DD4BF] hover:bg-[#1E3E62]/50 rounded-xl transition"
+              className="p-1.5 text-slate-300 hover:text-[#2DD4BF] hover:bg-[#1E3E62]/50 rounded-xl transition flex-shrink-0"
             >
-              <SettingsIcon className="w-5 h-5" />
+              <SettingsIcon className="w-4 h-4" />
             </Link>
 
             {user ? (
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1.5 flex-shrink-0">
                 {/* Saved Collection shortcut */}
                 <Link
                   to="/saved"
                   title="Saved Places & Trips"
-                  className="p-2 text-slate-300 hover:text-[#2DD4BF] hover:bg-[#1E3E62]/50 rounded-xl transition"
+                  className="p-1.5 text-slate-300 hover:text-[#2DD4BF] hover:bg-[#1E3E62]/50 rounded-xl transition flex-shrink-0"
                 >
-                  <BookmarkCheck className="w-5 h-5" />
+                  <BookmarkCheck className="w-4 h-4" />
                 </Link>
 
                 {/* Notifications */}
                 <Link
                   to="/dashboard"
                   title="Notifications"
-                  className="p-2 text-slate-300 hover:text-[#2DD4BF] hover:bg-[#1E3E62]/50 rounded-xl relative transition"
+                  className="p-1.5 text-slate-300 hover:text-[#2DD4BF] hover:bg-[#1E3E62]/50 rounded-xl relative transition flex-shrink-0"
                 >
-                  <Bell className="w-5 h-5" />
+                  <Bell className="w-4 h-4" />
                   {unreadNotifications > 0 && (
-                    <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-[#FF6B35] rounded-full ring-2 ring-[#0B192C]"></span>
+                    <span className="absolute top-1 right-1 w-2 h-2 bg-[#FF6B35] rounded-full ring-2 ring-[#0B192C]"></span>
                   )}
                 </Link>
 
@@ -136,15 +160,15 @@ export const Navbar: React.FC = () => {
                 <div className="relative">
                   <button
                     onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                    className="flex items-center space-x-2 p-1.5 pr-3 rounded-full border border-[#0F766E]/50 hover:border-[#2DD4BF] bg-[#07101C] hover:bg-[#1E3E62]/40 transition shadow-xs"
+                    className="flex items-center space-x-1.5 p-1 pr-2.5 rounded-full border border-[#0F766E]/50 hover:border-[#2DD4BF] bg-[#07101C] hover:bg-[#1E3E62]/40 transition shadow-xs whitespace-nowrap"
                   >
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#0F766E] to-[#2DD4BF] flex items-center justify-center text-white font-bold text-sm">
-                      {user.name.charAt(0)}
+                    <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-[#0F766E] to-[#2DD4BF] flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
+                      {user.name.charAt(0).toUpperCase()}
                     </div>
-                    <span className="text-sm font-semibold text-slate-200 max-w-[110px] truncate">
+                    <span className="text-xs font-semibold text-slate-200 max-w-[90px] truncate whitespace-nowrap">
                       {user.name.split(' ')[0]}
                     </span>
-                    <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                    <ChevronDown className="w-3 h-3 text-slate-400" />
                   </button>
 
                   {userDropdownOpen && (
@@ -215,16 +239,16 @@ export const Navbar: React.FC = () => {
                 </div>
               </div>
             ) : (
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1.5 whitespace-nowrap flex-shrink-0">
                 <Link
                   to="/login"
-                  className="px-4 py-2 text-sm font-semibold text-[#2DD4BF] hover:bg-[#0F766E]/30 border border-[#2DD4BF]/40 rounded-xl transition"
+                  className="px-3 py-1.5 text-xs font-semibold text-[#2DD4BF] hover:bg-[#0F766E]/30 border border-[#2DD4BF]/40 rounded-xl transition whitespace-nowrap"
                 >
                   Log In
                 </Link>
                 <Link
                   to="/signup"
-                  className="px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-[#FF6B35] to-[#EA580C] hover:brightness-110 rounded-xl shadow-md transition"
+                  className="px-3 py-1.5 text-xs font-semibold text-white bg-gradient-to-r from-[#FF6B35] to-[#EA580C] hover:brightness-110 rounded-xl shadow-sm transition whitespace-nowrap"
                 >
                   Sign Up
                 </Link>
@@ -232,88 +256,169 @@ export const Navbar: React.FC = () => {
             )}
           </div>
 
-          {/* Mobile Menu Toggle Button */}
-          <div className="flex items-center space-x-2 lg:hidden">
+          {/* Mobile Right Controls: Theme Toggle & Hamburger Menu */}
+          <div className="flex items-center space-x-2 lg:hidden flex-shrink-0">
+            {/* Quick Mobile Theme Button */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 text-slate-200 hover:text-white rounded-xl border border-[#0F766E]/50 bg-[#07101C]/80 transition"
+              title={`Switch to ${theme === 'dark' ? 'White' : 'Dark'} theme`}
+              aria-label="Toggle Theme"
+            >
+              {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-[#2DD4BF]" />}
+            </button>
+
             {user && (
-              <Link to="/dashboard" className="p-2 text-slate-600">
+              <Link to="/dashboard" className="p-2 text-slate-200 hover:text-[#2DD4BF] transition relative">
                 <Bell className="w-5 h-5" />
+                {unreadNotifications > 0 && (
+                  <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#FF6B35] rounded-full ring-2 ring-[#0B192C]"></span>
+                )}
               </Link>
             )}
+
+            {/* Hamburger Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 text-slate-700 rounded-xl hover:bg-emerald-50 transition"
+              className="p-2 text-slate-200 rounded-xl hover:bg-[#1E3E62]/50 transition border border-[#0F766E]/40"
+              aria-label="Open Navigation Menu"
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {mobileMenuOpen ? <X className="w-6 h-6 text-[#2DD4BF]" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Menu Dropdown */}
+      {/* Mobile Drawer Navigation */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-emerald-100 bg-[#FAF9F6] px-4 pt-3 pb-6 space-y-1 shadow-lg">
-          {navLinks.map((link) => {
-            const Icon = link.icon;
-            return (
-              <Link
-                key={link.name}
-                to={link.path}
-                className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl text-base font-semibold ${
-                  link.highlight
-                    ? 'bg-[#1B5E20] text-white font-bold'
-                    : location.pathname === link.path
-                    ? 'bg-emerald-100/70 text-[#1B5E20] font-bold'
-                    : 'text-slate-700 hover:bg-emerald-50/50'
+        <div className="lg:hidden border-t border-[#0F766E]/40 bg-[#0B192C] text-slate-100 px-4 pt-4 pb-8 space-y-3 shadow-2xl animate-in slide-in-from-top-2 duration-150 max-h-[85vh] overflow-y-auto">
+          {/* Mobile Theme Selection Buttons: White / Dark */}
+          <div className="p-3 bg-[#07101C] rounded-2xl border border-[#0F766E]/30 flex items-center justify-between">
+            <span className="text-xs font-semibold text-slate-300">Theme Mode</span>
+            <div className="flex items-center space-x-1.5 bg-[#0B192C] p-1 rounded-xl border border-[#1E3E62]">
+              <button
+                onClick={() => setTheme('light')}
+                className={`flex items-center space-x-1 px-3 py-1 rounded-lg text-xs font-bold transition ${
+                  theme === 'light'
+                    ? 'bg-[#FAF9F6] text-slate-900 shadow-sm'
+                    : 'text-slate-400 hover:text-white'
                 }`}
               >
-                {Icon && <Icon className="w-5 h-5" />}
-                <span>{link.name}</span>
-              </Link>
-            );
-          })}
+                <Sun className="w-3.5 h-3.5 text-amber-500" />
+                <span>White</span>
+              </button>
+              <button
+                onClick={() => setTheme('dark')}
+                className={`flex items-center space-x-1 px-3 py-1 rounded-lg text-xs font-bold transition ${
+                  theme === 'dark'
+                    ? 'bg-[#0F766E] text-white shadow-sm'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <Moon className="w-3.5 h-3.5 text-[#2DD4BF]" />
+                <span>Dark</span>
+              </button>
+            </div>
+          </div>
 
-          <div className="border-t border-slate-100 pt-3 mt-2">
+          {/* Multilingual Selector on Mobile */}
+          <div className="flex items-center justify-between p-3 bg-[#07101C] rounded-2xl border border-[#0F766E]/30">
+            <span className="text-xs font-semibold text-slate-300">Language</span>
+            <LanguageSelector />
+          </div>
+
+          {/* Nav Links */}
+          <div className="space-y-1">
+            {navLinks.map((link) => {
+              const Icon = link.icon;
+              const isActive = location.pathname === link.path;
+              return (
+                <Link
+                  key={link.name}
+                  to={link.path}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center space-x-3 px-3.5 py-3 rounded-xl text-sm font-semibold transition ${
+                    link.highlight
+                      ? 'bg-gradient-to-r from-[#FF6B35] to-[#EA580C] text-white font-bold shadow-sm'
+                      : isActive
+                      ? 'bg-[#0F766E]/40 text-[#2DD4BF] border border-[#2DD4BF]/40 font-bold'
+                      : 'text-slate-200 hover:bg-[#1E3E62]/40 hover:text-[#2DD4BF]'
+                  }`}
+                >
+                  {Icon && <Icon className={`w-5 h-5 ${link.highlight ? 'text-white' : 'text-[#2DD4BF]'}`} />}
+                  <span>{link.name}</span>
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* User Account / Auth Section in Mobile Menu */}
+          <div className="border-t border-[#1E3E62] pt-3 mt-2">
             {user ? (
-              <div className="space-y-1">
-                <div className="px-3 py-2">
+              <div className="space-y-2">
+                <div className="px-3.5 py-2.5 bg-[#07101C] rounded-xl border border-[#0F766E]/30">
                   <p className="text-xs text-slate-400">Signed in as</p>
-                  <p className="text-sm font-bold text-slate-900">{user.name}</p>
+                  <p className="text-sm font-bold text-white truncate">{user.name}</p>
+                  <span className="inline-block mt-1 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#0F766E]/40 text-[#2DD4BF] border border-[#2DD4BF]/30">
+                    {user.role.replace('_', ' ')}
+                  </span>
                 </div>
+
                 {isSuperAdmin && (
                   <Link
                     to="/admin"
-                    className="flex items-center space-x-2 px-3 py-2 text-sm font-bold text-purple-700 bg-purple-50 rounded-xl"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center space-x-2.5 px-3.5 py-2.5 text-sm font-bold text-[#2DD4BF] bg-[#0F766E]/20 rounded-xl border border-[#2DD4BF]/30"
                   >
                     <Shield className="w-4 h-4" />
-                    <span>Super Admin Panel</span>
+                    <span>Admin Control Panel</span>
                   </Link>
                 )}
+
                 {isBusinessOwner && (
                   <Link
                     to="/business/dashboard"
-                    className="flex items-center space-x-2 px-3 py-2 text-sm font-bold text-emerald-700 bg-emerald-50 rounded-xl"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center space-x-2.5 px-3.5 py-2.5 text-sm font-bold text-teal-300 bg-[#0F766E]/20 rounded-xl"
                   >
                     <Briefcase className="w-4 h-4" />
                     <span>Business Dashboard</span>
                   </Link>
                 )}
+
                 <Link
                   to="/dashboard"
-                  className="flex items-center space-x-2 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 rounded-xl"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center space-x-2.5 px-3.5 py-2.5 text-sm font-semibold text-slate-200 hover:bg-[#1E3E62]/40 rounded-xl"
                 >
-                  <UserIcon className="w-4 h-4" />
-                  <span>My Dashboard</span>
+                  <UserIcon className="w-4 h-4 text-slate-400" />
+                  <span>Tourist Dashboard</span>
                 </Link>
+
                 <Link
                   to="/saved"
-                  className="flex items-center space-x-2 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 rounded-xl"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center space-x-2.5 px-3.5 py-2.5 text-sm font-semibold text-slate-200 hover:bg-[#1E3E62]/40 rounded-xl"
                 >
-                  <BookmarkCheck className="w-4 h-4" />
-                  <span>Saved Items</span>
+                  <BookmarkCheck className="w-4 h-4 text-slate-400" />
+                  <span>Saved Trips & Places</span>
                 </Link>
+
+                <Link
+                  to="/settings"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center space-x-2.5 px-3.5 py-2.5 text-sm font-semibold text-slate-200 hover:bg-[#1E3E62]/40 rounded-xl"
+                >
+                  <SettingsIcon className="w-4 h-4 text-slate-400" />
+                  <span>{t('settings')} & Preferences</span>
+                </Link>
+
                 <button
-                  onClick={logout}
-                  className="w-full flex items-center space-x-2 px-3 py-2 text-sm font-semibold text-rose-600 hover:bg-rose-50 rounded-xl text-left"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    logout();
+                  }}
+                  className="w-full flex items-center space-x-2.5 px-3.5 py-2.5 text-sm font-semibold text-rose-400 hover:bg-rose-950/40 rounded-xl transition text-left"
                 >
                   <LogOut className="w-4 h-4" />
                   <span>Sign Out</span>
@@ -323,13 +428,15 @@ export const Navbar: React.FC = () => {
               <div className="grid grid-cols-2 gap-2 pt-2">
                 <Link
                   to="/login"
-                  className="w-full text-center py-2.5 text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full text-center py-2.5 text-sm font-semibold text-[#2DD4BF] border border-[#2DD4BF]/40 bg-[#07101C] hover:bg-[#1E3E62]/40 rounded-xl transition"
                 >
                   Log In
                 </Link>
                 <Link
                   to="/signup"
-                  className="w-full text-center py-2.5 text-sm font-semibold text-white bg-[#1B5E20] hover:bg-[#154a19] rounded-xl transition"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full text-center py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-[#FF6B35] to-[#EA580C] hover:brightness-110 rounded-xl shadow-md transition"
                 >
                   Sign Up
                 </Link>

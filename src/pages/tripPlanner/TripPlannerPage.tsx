@@ -5,6 +5,7 @@ import { City } from '../../types';
 import { useLanguage } from '../../context/LanguageContext';
 import { IndianMonumentsSkyline } from '../../components/common/IndianMonumentsSkyline';
 import { PreTripBudgetChart } from '../../components/budget/PreTripBudgetChart';
+import { SafeImage } from '../../components/common/SafeImage';
 import {
   Sparkles,
   MapPin,
@@ -260,7 +261,7 @@ export const TripPlannerPage: React.FC = () => {
 
                   {selectedCityObj && (
                     <div className="p-3.5 bg-[#FAF9F6] rounded-2xl border border-[#2DD4BF]/30 flex items-center space-x-3">
-                      <img src={selectedCityObj.cover_image} alt={selectedCityObj.name} className="w-12 h-12 rounded-xl object-cover" />
+                      <SafeImage src={selectedCityObj.cover_image} alt={selectedCityObj.name} className="w-12 h-12 rounded-xl object-cover" category="city" />
                       <div>
                         <span className="text-xs text-[#0F766E] font-bold">{t('selectedDestinationLabel', 'Selected Destination:')}</span>
                         <h5 className="text-sm font-bold text-slate-900">{selectedCityObj.name}, {selectedCityObj.state_name}</h5>

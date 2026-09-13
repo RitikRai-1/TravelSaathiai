@@ -5,6 +5,7 @@ import { City, TouristPlace, HiddenGem, Hotel, Restaurant, TaxiService } from '.
 import { TaxiBookingModal } from '../../components/booking/TaxiBookingModal';
 import { useLanguage } from '../../context/LanguageContext';
 import { IndianMonumentsSkyline } from '../../components/common/IndianMonumentsSkyline';
+import { SafeImage } from '../../components/common/SafeImage';
 import {
   Compass,
   Sparkles,
@@ -221,10 +222,11 @@ export const HomePage: React.FC = () => {
               transition: 'opacity 1.2s ease-in-out, transform 8s ease-out',
             }}
           >
-            <img
+            <SafeImage
               src={slide.image}
               alt={slide.title}
               className="w-full h-full object-cover object-center"
+              category="city"
             />
             {/* Atmospheric Indian Dusk & Midnight Overlays */}
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-slate-900/40"></div>
@@ -408,10 +410,11 @@ export const HomePage: React.FC = () => {
           <div className="bg-white rounded-3xl overflow-hidden border border-slate-200/80 shadow-xs card-hover flex flex-col justify-between">
             <div>
               <div className="h-48 overflow-hidden relative">
-                <img
+                <SafeImage
                   src="https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=800&q=80"
                   alt="Traditional Food Tour"
                   className="w-full h-full object-cover"
+                  category="food"
                 />
                 <span className="absolute top-3 left-3 bg-[#0F766E] text-white text-[10px] font-bold px-2.5 py-1 rounded-full">
                   Food &amp; Dhaba Trail
@@ -445,10 +448,11 @@ export const HomePage: React.FC = () => {
           <div className="bg-white rounded-3xl overflow-hidden border border-slate-200/80 shadow-xs card-hover flex flex-col justify-between">
             <div>
               <div className="h-48 overflow-hidden relative">
-                <img
+                <SafeImage
                   src="https://images.unsplash.com/photo-1533587851505-d119e13fa0d7?auto=format&fit=crop&w=800&q=80"
                   alt="Folk Dance Show"
                   className="w-full h-full object-cover"
+                  category="place"
                 />
                 <span className="absolute top-3 left-3 bg-[#0F766E] text-white text-[10px] font-bold px-2.5 py-1 rounded-full">
                   Folk &amp; Cultural Heritage
@@ -482,10 +486,11 @@ export const HomePage: React.FC = () => {
           <div className="bg-white rounded-3xl overflow-hidden border border-slate-200/80 shadow-xs card-hover flex flex-col justify-between">
             <div>
               <div className="h-48 overflow-hidden relative">
-                <img
+                <SafeImage
                   src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80"
                   alt="Village Homestay"
                   className="w-full h-full object-cover"
+                  category="hotel"
                 />
                 <span className="absolute top-3 left-3 bg-[#FF6B35] text-white text-[10px] font-bold px-2.5 py-1 rounded-full">
                   Farm &amp; Heritage Stay
@@ -539,10 +544,11 @@ export const HomePage: React.FC = () => {
               className="group bg-white rounded-3xl overflow-hidden border border-slate-200/80 shadow-xs card-hover flex flex-col"
             >
               <div className="relative h-56 overflow-hidden">
-                <img
+                <SafeImage
                   src={city.cover_image}
                   alt={city.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                  category="city"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0B192C] via-black/30 to-transparent"></div>
                 <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-xs text-[#0B192C] text-xs font-bold px-2.5 py-1 rounded-full shadow-xs">
@@ -597,10 +603,11 @@ export const HomePage: React.FC = () => {
                 className="bg-white rounded-3xl overflow-hidden border border-emerald-100 shadow-sm card-hover flex flex-col"
               >
                 <div className="relative h-52 overflow-hidden">
-                  <img
+                  <SafeImage
                     src={gem.photos?.[0] || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80'}
                     alt={gem.name}
                     className="w-full h-full object-cover"
+                    category="gem"
                   />
                   <span className="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-xs text-white text-xs font-semibold px-2.5 py-1 rounded-full">
                     {gem.city_name}
@@ -725,10 +732,11 @@ export const HomePage: React.FC = () => {
                 >
                   <div>
                     <div className="relative h-48 overflow-hidden">
-                      <img
+                      <SafeImage
                         src={place.cover_image}
                         alt={place.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                        category="place"
                       />
                       <span className="absolute top-3 left-3 bg-[#0B192C]/80 backdrop-blur-xs text-white text-xs font-semibold px-2.5 py-1 rounded-full">
                         {place.city_name}
@@ -790,10 +798,11 @@ export const HomePage: React.FC = () => {
                 className="group bg-white rounded-3xl overflow-hidden border border-slate-200/80 shadow-xs card-hover flex flex-col"
               >
                 <div className="relative h-48 overflow-hidden">
-                  <img
+                  <SafeImage
                     src={hotel.photos?.[0] || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80'}
                     alt={hotel.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                    category="hotel"
                   />
                   <span className="absolute top-3 left-3 bg-[#0B192C]/80 backdrop-blur-xs text-white text-xs font-semibold px-2.5 py-1 rounded-full">
                     {hotel.city_name}
@@ -850,10 +859,11 @@ export const HomePage: React.FC = () => {
                 className="group bg-white rounded-3xl overflow-hidden border border-slate-200/80 shadow-xs card-hover flex flex-col"
               >
                 <div className="relative h-48 overflow-hidden">
-                  <img
+                  <SafeImage
                     src={restaurant.photos?.[0] || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80'}
                     alt={restaurant.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                    category="restaurant"
                   />
                   <span className="absolute top-3 left-3 bg-[#0B192C]/80 backdrop-blur-xs text-white text-xs font-semibold px-2.5 py-1 rounded-full">
                     {restaurant.city_name}

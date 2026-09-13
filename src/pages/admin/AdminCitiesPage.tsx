@@ -13,6 +13,7 @@ import {
   X
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { SafeImage } from '../../components/common/SafeImage';
 
 export const AdminCitiesPage: React.FC = () => {
   const [cities, setCities] = useState<any[]>([]);
@@ -226,10 +227,11 @@ export const AdminCitiesPage: React.FC = () => {
                 <tr key={city.id} className="hover:bg-slate-800/40 transition">
                   <td className="py-3 px-4">
                     <div className="flex items-center space-x-3">
-                      <img
+                      <SafeImage
                         src={city.cover_image}
                         alt={city.name}
                         className="w-10 h-10 rounded-lg object-cover bg-slate-800 flex-shrink-0"
+                        category="city"
                       />
                       <div>
                         <div className="font-bold text-white text-sm">{city.name}</div>

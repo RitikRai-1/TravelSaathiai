@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { BookmarkCheck, Star, MapPin, Compass, ArrowRight, Heart } from 'lucide-react';
+import { SafeImage } from '../../components/common/SafeImage';
 
 export const SavedPage: React.FC = () => {
   const { user } = useAuth();
@@ -75,7 +76,7 @@ export const SavedPage: React.FC = () => {
                     className="bg-white rounded-2xl overflow-hidden border border-slate-200/80 shadow-xs card-hover flex flex-col justify-between"
                   >
                     <div className="relative h-44">
-                      <img src={p.cover_image} alt={p.name} className="w-full h-full object-cover" />
+                      <SafeImage src={p.cover_image} alt={p.name} className="w-full h-full object-cover" category="place" />
                       <span className="absolute bottom-2 right-2 bg-amber-400 text-slate-950 text-xs font-bold px-2 py-0.5 rounded-md flex items-center space-x-1">
                         <Star className="w-3 h-3 fill-current" />
                         <span>{p.rating}</span>

@@ -3,6 +3,7 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { api } from '../../services/api';
 import { Search, MapPin, Hotel, Utensils, Sparkles, Star, ArrowRight, Compass, Filter } from 'lucide-react';
 import { IndianMonumentsSkyline } from '../../components/common/IndianMonumentsSkyline';
+import { SafeImage } from '../../components/common/SafeImage';
 
 export const SearchResultsPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -180,10 +181,11 @@ export const SearchResultsPage: React.FC = () => {
                     className="group bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-2xs hover:shadow-md transition flex flex-col justify-between"
                   >
                     <div className="relative h-44 w-full overflow-hidden">
-                      <img
+                      <SafeImage
                         src={city.cover_image}
                         alt={city.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                        category="city"
                       />
                       <div className="absolute top-3 left-3 bg-[#1B5E20] text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
                         City
@@ -222,10 +224,11 @@ export const SearchResultsPage: React.FC = () => {
                     className="group bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-2xs hover:shadow-md transition flex flex-col justify-between"
                   >
                     <div className="relative h-44 w-full overflow-hidden">
-                      <img
+                      <SafeImage
                         src={place.cover_image}
                         alt={place.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                        category="place"
                       />
                       <div className="absolute top-3 left-3 bg-emerald-700 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
                         {place.category || 'Attraction'}
@@ -270,10 +273,11 @@ export const SearchResultsPage: React.FC = () => {
                     className="group bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-2xs hover:shadow-md transition flex flex-col justify-between"
                   >
                     <div className="relative h-44 w-full overflow-hidden">
-                      <img
+                      <SafeImage
                         src={JSON.parse(hotel.photos_json || '[""]')[0] || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80'}
                         alt={hotel.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                        category="hotel"
                       />
                       <div className="absolute top-3 left-3 bg-purple-700 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
                         Verified Stay
@@ -318,10 +322,11 @@ export const SearchResultsPage: React.FC = () => {
                     className="group bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-2xs hover:shadow-md transition flex flex-col justify-between"
                   >
                     <div className="relative h-44 w-full overflow-hidden">
-                      <img
+                      <SafeImage
                         src={JSON.parse(rest.photos_json || '[""]')[0] || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80'}
                         alt={rest.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                        category="restaurant"
                       />
                       <div className="absolute top-3 left-3 bg-amber-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
                         {rest.cuisine || 'Regional'}
@@ -366,10 +371,11 @@ export const SearchResultsPage: React.FC = () => {
                     className="group bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-2xs hover:shadow-md transition flex flex-col justify-between"
                   >
                     <div className="relative h-44 w-full overflow-hidden">
-                      <img
+                      <SafeImage
                         src={JSON.parse(gem.photos_json || '[""]')[0] || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80'}
                         alt={gem.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                        category="gem"
                       />
                       <div className="absolute top-3 left-3 bg-teal-700 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
                         Offbeat Spot

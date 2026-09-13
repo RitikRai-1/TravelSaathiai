@@ -57,7 +57,7 @@ const ScrollToTop: React.FC = () => {
 // Main layout wrapper with Navbar and Footer
 const MainLayout: React.FC = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-[#FAF9F6] text-slate-900 selection:bg-[#1B5E20] selection:text-white relative">
+    <div className="min-h-screen flex flex-col bg-[#FAF9F6] dark:bg-[#07101C] text-slate-900 dark:text-slate-100 selection:bg-[#0F766E] selection:text-white relative transition-colors duration-200">
       <Navbar />
       <main className="flex-grow">
         <Outlet />

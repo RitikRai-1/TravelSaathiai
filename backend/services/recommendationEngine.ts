@@ -244,41 +244,46 @@ export class RecommendationEngine {
       }];
     }
 
-    // 5. Fetch Approved Restaurants & filter by food preference
+    // 5. Fetch Approved Restaurants & strictly filter by food preference
     let allRestaurants = dbManager.query<any>(
       'SELECT * FROM restaurants WHERE city_id = ? AND approval_status = "APPROVED" AND is_published = 1 ORDER BY avg_cost_for_two ASC',
       [input.cityId]
     );
 
-    // Filter by food preference (veg gets veg+both, non_veg gets non_veg+both)
     const isVegPref = input.foodPreference === 'veg';
     const isNonVegPref = input.foodPreference === 'non_veg';
     let restaurants: any[];
+
     if (isVegPref) {
-      restaurants = allRestaurants.filter((r: any) => {
-        const ft = r.food_type || 'both';
-        return ft === 'veg' || ft === 'both';
-      });
+      // Strictly pure vegetarian restaurants only
+      restaurants = allRestaurants.filter((r: any) => r.food_type === 'veg');
+      // If none found in DB, include restaurants with vegetarian offerings (excluding strict non_veg)
+      if (restaurants.length === 0) {
+        restaurants = allRestaurants.filter((r: any) => r.food_type !== 'non_veg');
+      }
+      // If still empty, supply pure vegetarian seed options
+      if (restaurants.length === 0) {
+        restaurants = [
+          { id: null, name: `${city.name} Pure Veg Heritage Kitchen`, avg_cost_for_two: 500, cuisine: 'Pure Veg Traditional Thali & Regional', food_type: 'veg', photos_json: JSON.stringify(['https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=1000&q=80', 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=1000&q=80']) },
+          { id: null, name: `${city.name} Satvik Bhojanalaya`, avg_cost_for_two: 350, cuisine: 'Pure Veg Satvik & Jain Thalis', food_type: 'veg', photos_json: JSON.stringify(['https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=1000&q=80', 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1000&q=80']) },
+          { id: null, name: `${city.name} Grand Veg Courtyard Dining`, avg_cost_for_two: 750, cuisine: 'Pure Veg North & South Indian Multi-Cuisine', food_type: 'veg', photos_json: JSON.stringify(['https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1000&q=80', 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=1000&q=80']) },
+        ];
+      }
     } else if (isNonVegPref) {
-      restaurants = allRestaurants.filter((r: any) => {
-        const ft = r.food_type || 'both';
-        return ft === 'non_veg' || ft === 'both';
-      });
+      // Restaurants serving non-vegetarian options
+      restaurants = allRestaurants.filter((r: any) => r.food_type === 'non_veg' || r.food_type === 'both');
+      if (restaurants.length === 0) {
+        restaurants = allRestaurants;
+      }
+      if (restaurants.length === 0) {
+        restaurants = [
+          { id: null, name: `${city.name} Mughlai & Tandoori Kitchen`, avg_cost_for_two: 800, cuisine: 'Mughlai & North Indian Non-Veg', food_type: 'non_veg', photos_json: JSON.stringify(['https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1000&q=80', 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=1000&q=80']) },
+          { id: null, name: `${city.name} Coastal & Regional Grills`, avg_cost_for_two: 900, cuisine: 'Regional Non-Veg & Seafood', food_type: 'both', photos_json: JSON.stringify(['https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1000&q=80', 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1000&q=80']) },
+        ];
+      }
     } else {
-      restaurants = allRestaurants;
-    }
-
-    // Fallback: if filtering removes all restaurants, use all (should not happen with good seed data)
-    if (restaurants.length === 0) {
-      restaurants = allRestaurants;
-    }
-
-    if (restaurants.length === 0) {
-      const vegLabel = isVegPref ? 'Pure Veg ' : '';
-      restaurants = [
-        { id: null, name: `${city.name} ${vegLabel}Heritage Kitchen`, avg_cost_for_two: 500, cuisine: `${isVegPref ? 'Pure Veg ' : ''}Traditional Thali & Regional`, food_type: isVegPref ? 'veg' : 'both', photos_json: JSON.stringify(['https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1000&q=80', 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1000&q=80']) },
-        { id: null, name: `${city.name} ${vegLabel}Street Food Corner`, avg_cost_for_two: 300, cuisine: `${isVegPref ? 'Veg ' : ''}Street Food & Snacks`, food_type: isVegPref ? 'veg' : 'both', photos_json: JSON.stringify(['https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=1000&q=80', 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=1000&q=80']) },
-        { id: null, name: `${city.name} Grand Courtyard Dining`, avg_cost_for_two: 800, cuisine: `${isVegPref ? 'Pure Veg ' : ''}Multi-Cuisine`, food_type: isVegPref ? 'veg' : 'both', photos_json: JSON.stringify(['https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1000&q=80', 'https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1000&q=80']) },
+      restaurants = allRestaurants.length > 0 ? allRestaurants : [
+        { id: null, name: `${city.name} Heritage Dining`, avg_cost_for_two: 600, cuisine: 'Traditional Indian Multi-Cuisine', food_type: 'both', photos_json: JSON.stringify(['https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1000&q=80']) }
       ];
     }
 
@@ -578,10 +583,12 @@ export class RecommendationEngine {
         stopType: 'BREAKFAST',
         entityType: 'RESTAURANT',
         entityId: breakfastRest.id,
-        title: `Breakfast at ${breakfastRest.name}`,
-        category: 'Breakfast & Refreshment',
+        title: isVegPref ? `Pure Veg Breakfast at ${breakfastRest.name}` : `Breakfast at ${breakfastRest.name}`,
+        category: isVegPref ? 'Pure Veg Breakfast' : 'Breakfast & Refreshment',
         imageUrl: breakfastPhoto,
-        description: `Start Day ${d} energized with hot local delicacies, fresh masala chai, and authentic local breakfast.`,
+        description: isVegPref
+          ? `Start Day ${d} with wholesome pure vegetarian breakfast, piping hot parathas/idlis, and fresh masala chai.`
+          : `Start Day ${d} energized with hot local delicacies, fresh masala chai, and authentic local breakfast.`,
         startTime: '08:30 AM',
         durationHours: 1.0,
         bestVisitingTime: '08:30 AM - 09:30 AM',
@@ -634,10 +641,12 @@ export class RecommendationEngine {
         stopType: 'LUNCH',
         entityType: 'RESTAURANT',
         entityId: lunchRest.id,
-        title: `Authentic Lunch at ${lunchRest.name}`,
-        category: lunchRest.cuisine,
+        title: isVegPref ? `Pure Veg Lunch at ${lunchRest.name}` : `Authentic Lunch at ${lunchRest.name}`,
+        category: isVegPref ? 'Pure Veg Dining' : lunchRest.cuisine,
         imageUrl: lunchPhoto,
-        description: `Delight in traditional culinary specialties, thalis, and local chef favourites.`,
+        description: isVegPref
+          ? `Delight in traditional pure vegetarian thalis, Sattvic specialties, and local chef delicacies.`
+          : `Delight in traditional culinary specialties, flavorful dishes, and local chef favourites.`,
         startTime: '01:30 PM',
         durationHours: 1.25,
         bestVisitingTime: '01:00 PM - 02:30 PM',
@@ -718,10 +727,12 @@ export class RecommendationEngine {
         stopType: 'DINNER',
         entityType: 'RESTAURANT',
         entityId: dinnerRest.id,
-        title: `Dinner at ${dinnerRest.name}`,
-        category: 'Dinner Dining',
+        title: isVegPref ? `Pure Veg Dinner at ${dinnerRest.name}` : `Dinner at ${dinnerRest.name}`,
+        category: isVegPref ? 'Pure Veg Dinner' : 'Dinner Dining',
         imageUrl: dinnerPhoto,
-        description: `Unwind with a comforting dinner accompanied by pleasant music and ambience.`,
+        description: isVegPref
+          ? `Unwind with a wholesome pure vegetarian dinner, paneer & dal specialties, and traditional desserts.`
+          : `Unwind with a comforting dinner accompanied by pleasant music and ambience.`,
         startTime: '08:00 PM',
         durationHours: 1.5,
         bestVisitingTime: 'Evening (07:30 PM - 09:30 PM)',

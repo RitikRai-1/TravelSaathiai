@@ -21,9 +21,9 @@ export const TravelSaathiLogo: React.FC<TravelSaathiLogoProps> = ({
   }[size as 'sm' | 'md' | 'lg'] || 'h-11 w-11';
 
   return (
-    <div className={`flex items-center space-x-3 ${className}`}>
+    <div className={`flex items-center space-x-2 sm:space-x-3 whitespace-nowrap flex-shrink-0 ${className}`}>
       {/* 3D Brand Logo Emblem */}
-      <div className={`relative ${sizeClasses} rounded-2xl overflow-hidden shadow-md shadow-[#0B192C]/40 border border-[#2DD4BF]/40 bg-[#0B192C] flex-shrink-0 group-hover:scale-105 transition-transform`}>
+      <div className={`relative ${sizeClasses} rounded-xl sm:rounded-2xl overflow-hidden shadow-md shadow-[#0B192C]/40 border border-[#2DD4BF]/40 bg-[#0B192C] flex-shrink-0 group-hover:scale-105 transition-transform`}>
         <img
           src="/logo.png"
           alt="TravelSaathi AI Logo"
@@ -32,12 +32,12 @@ export const TravelSaathiLogo: React.FC<TravelSaathiLogoProps> = ({
       </div>
 
       {/* Brand Text */}
-      <div>
-        <div className="flex items-center space-x-1.5">
-          <span className={`font-black text-2xl tracking-tight font-heading ${variant === 'white' ? 'text-[#FAF9F6]' : 'text-[#0B192C]'}`}>
+      <div className="whitespace-nowrap">
+        <div className="flex items-center space-x-1 sm:space-x-1.5 whitespace-nowrap">
+          <span className={`font-black text-lg sm:text-2xl tracking-tight font-heading whitespace-nowrap ${variant === 'white' ? 'text-[#FAF9F6]' : 'text-[#0B192C]'}`}>
             TravelSaathi
           </span>
-          <span className="font-black text-2xl tracking-tight text-[#FF6B35] font-heading">
+          <span className="font-black text-lg sm:text-2xl tracking-tight text-[#FF6B35] font-heading whitespace-nowrap">
             AI
           </span>
           <span className={`text-[9px] uppercase font-bold tracking-widest px-1.5 py-0.5 rounded-md hidden sm:inline-block ${

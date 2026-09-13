@@ -20,11 +20,11 @@ export const getRestaurants = async (req: Request, res: Response): Promise<void>
     }
 
     if (food_type) {
-      if (food_type === 'veg') {
-        sql += " AND (r.food_type = 'veg' OR r.food_type = 'both')";
+      if (food_type === 'veg' || food_type === 'pure_veg') {
+        sql += " AND r.food_type = 'veg'";
       } else if (food_type === 'non_veg') {
         sql += " AND (r.food_type = 'non_veg' OR r.food_type = 'both')";
-      } else {
+      } else if (food_type !== 'all') {
         sql += ' AND r.food_type = ?';
         params.push(food_type);
       }

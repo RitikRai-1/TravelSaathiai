@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { api } from '../../services/api';
 import { Hotel, City } from '../../types';
 import { IndianMonumentsSkyline } from '../../components/common/IndianMonumentsSkyline';
+import { SafeImage } from '../../components/common/SafeImage';
 import { Hotel as HotelIcon, Star, MapPin, Search, Filter, ArrowRight } from 'lucide-react';
 
 export const HotelsPage: React.FC = () => {
@@ -107,10 +108,11 @@ export const HotelsPage: React.FC = () => {
             >
               <div>
                 <div className="relative h-52 overflow-hidden">
-                  <img
+                  <SafeImage
                     src={hotel.photos?.[0] || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80'}
                     alt={hotel.name}
                     className="w-full h-full object-cover"
+                    category="hotel"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
 

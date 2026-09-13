@@ -4,6 +4,7 @@ import { api } from '../../services/api';
 import { Hotel, HotelRoom, Review, TouristPlace } from '../../types';
 import { ReviewModal } from '../../components/modals/ReviewModal';
 import { IndianMonumentsSkyline } from '../../components/common/IndianMonumentsSkyline';
+import { SafeImage } from '../../components/common/SafeImage';
 import {
   Hotel as HotelIcon,
   Star,
@@ -148,10 +149,11 @@ export const HotelDetailPage: React.FC = () => {
       <div className="bg-white rounded-3xl overflow-hidden border border-slate-200/80 shadow-sm">
         {/* Main Viewport */}
         <div className="relative h-80 sm:h-[420px] w-full group overflow-hidden bg-slate-950">
-          <img
+          <SafeImage
             src={currentPhoto}
             alt={hotel.name}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            category="hotel"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent"></div>
 
@@ -230,7 +232,7 @@ export const HotelDetailPage: React.FC = () => {
                   activePhotoIdx === idx ? 'border-[#F9C74F] ring-2 ring-[#F9C74F]/40 scale-105' : 'border-transparent opacity-70 hover:opacity-100'
                 }`}
               >
-                <img src={p} alt="" className="w-full h-full object-cover" />
+                <SafeImage src={p} alt="" className="w-full h-full object-cover" category="hotel" />
               </button>
             ))}
           </div>
@@ -303,10 +305,11 @@ export const HotelDetailPage: React.FC = () => {
               <div key={room.id} className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-4 flex flex-col justify-between">
                 <div className="space-y-4">
                   <div className="relative h-48 rounded-2xl overflow-hidden group">
-                    <img
+                    <SafeImage
                       src={room.photos?.[0] || 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=600&q=80'}
                       alt={room.room_type}
                       className="w-full h-full object-cover transition duration-500 group-hover:scale-105"
+                      category="hotel"
                     />
                     <span className="absolute bottom-3 right-3 bg-white text-slate-900 text-xs font-bold px-3 py-1 rounded-full shadow-xs">
                       ₹{room.price_per_night} / night
@@ -434,7 +437,7 @@ export const HotelDetailPage: React.FC = () => {
                 className="bg-white rounded-2xl overflow-hidden border border-slate-200/80 shadow-2xs card-hover flex flex-col justify-between"
               >
                 <div className="relative h-36">
-                  <img src={p.cover_image} alt={p.name} className="w-full h-full object-cover" />
+                  <SafeImage src={p.cover_image} alt={p.name} className="w-full h-full object-cover" category="place" />
                   <span className="absolute top-2 left-2 bg-[#1B5E20] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
                     {p.category}
                   </span>
@@ -506,10 +509,11 @@ export const HotelDetailPage: React.FC = () => {
           </div>
 
           <div className="relative flex-1 flex items-center justify-center my-4 overflow-hidden">
-            <img
+            <SafeImage
               src={currentPhoto}
               alt={hotel.name}
               className="max-h-full max-w-full object-contain rounded-2xl shadow-2xl"
+              category="hotel"
             />
             {photos.length > 1 && (
               <>
@@ -538,7 +542,7 @@ export const HotelDetailPage: React.FC = () => {
                   activePhotoIdx === idx ? 'border-[#F9C74F] scale-110' : 'border-transparent opacity-50 hover:opacity-100'
                 }`}
               >
-                <img src={p} alt="" className="w-full h-full object-cover" />
+                <SafeImage src={p} alt="" className="w-full h-full object-cover" category="hotel" />
               </button>
             ))}
           </div>

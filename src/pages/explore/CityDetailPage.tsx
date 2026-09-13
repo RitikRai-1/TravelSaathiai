@@ -16,6 +16,7 @@ import {
   Bookmark
 } from 'lucide-react';
 import { TaxiBookingModal } from '../../components/booking/TaxiBookingModal';
+import { SafeImage } from '../../components/common/SafeImage';
 
 export const CityDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -89,10 +90,11 @@ export const CityDetailPage: React.FC = () => {
     <div className="min-h-screen pb-16">
       {/* Hero Section */}
       <div className="relative h-96 sm:h-[420px] bg-slate-900 overflow-hidden">
-        <img
+        <SafeImage
           src={city.cover_image || 'https://images.unsplash.com/photo-1587474260584-136574528ed5?auto=format&fit=crop&w=1600&q=80'}
           alt={city.name}
           className="w-full h-full object-cover opacity-60"
+          category="city"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
 
@@ -226,10 +228,11 @@ export const CityDetailPage: React.FC = () => {
                     className="group bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-sm hover:shadow-md transition flex flex-col"
                   >
                     <div className="h-48 relative overflow-hidden bg-slate-100">
-                      <img
+                      <SafeImage
                         src={place.gallery?.[0] || 'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=800&q=80'}
                         alt={place.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                        category="place"
                       />
                       <div className="absolute top-3 left-3">
                         <span className="px-2.5 py-0.5 rounded-full bg-slate-950/80 backdrop-blur-md text-[10px] font-bold text-amber-400">
@@ -294,10 +297,11 @@ export const CityDetailPage: React.FC = () => {
                     className="bg-white rounded-2xl border border-amber-200/80 overflow-hidden shadow-sm flex flex-col"
                   >
                     <div className="h-48 relative overflow-hidden bg-slate-100">
-                      <img
+                      <SafeImage
                         src={gem.photos?.[0] || 'https://images.unsplash.com/photo-1506461883276-594a12b11cf3?auto=format&fit=crop&w=800&q=80'}
                         alt={gem.name}
                         className="w-full h-full object-cover"
+                        category="gem"
                       />
                       <div className="absolute top-3 left-3">
                         <span className="px-2.5 py-0.5 rounded-full bg-amber-500 text-slate-950 text-[10px] font-bold">
@@ -361,10 +365,11 @@ export const CityDetailPage: React.FC = () => {
                     className="group bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-sm hover:shadow-md transition flex flex-col"
                   >
                     <div className="h-44 relative overflow-hidden bg-slate-100">
-                      <img
+                      <SafeImage
                         src={hotel.photos?.[0] || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80'}
                         alt={hotel.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                        category="hotel"
                       />
                       <div className="absolute top-3 right-3 flex items-center space-x-1 px-2 py-0.5 rounded-full bg-slate-950/80 backdrop-blur-md text-white text-xs font-bold">
                         <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
@@ -428,10 +433,11 @@ export const CityDetailPage: React.FC = () => {
                     className="group bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-sm hover:shadow-md transition flex flex-col"
                   >
                     <div className="h-44 relative overflow-hidden bg-slate-100">
-                      <img
+                      <SafeImage
                         src={rest.photos?.[0] || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80'}
                         alt={rest.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                        category="restaurant"
                       />
                       <div className="absolute top-3 right-3 flex items-center space-x-1 px-2 py-0.5 rounded-full bg-slate-950/80 backdrop-blur-md text-white text-xs font-bold">
                         <Star className="w-3 h-3 text-amber-400 fill-amber-400" />

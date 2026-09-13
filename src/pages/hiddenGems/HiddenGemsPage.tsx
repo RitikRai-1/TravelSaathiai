@@ -4,6 +4,7 @@ import { api } from '../../services/api';
 import { HiddenGem } from '../../types';
 import { Eye, MapPin, Clock, Star, Compass, ArrowRight, Sparkles } from 'lucide-react';
 import { IndianMonumentsSkyline } from '../../components/common/IndianMonumentsSkyline';
+import { SafeImage } from '../../components/common/SafeImage';
 
 export const HiddenGemsPage: React.FC = () => {
   const [gems, setGems] = useState<HiddenGem[]>([]);
@@ -85,10 +86,11 @@ export const HiddenGemsPage: React.FC = () => {
             >
               <div>
                 <div className="relative h-60 overflow-hidden">
-                  <img
+                  <SafeImage
                     src={gem.photos?.[0] || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80'}
                     alt={gem.name}
                     className="w-full h-full object-cover"
+                    category="gem"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
 

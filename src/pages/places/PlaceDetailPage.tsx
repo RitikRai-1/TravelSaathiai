@@ -5,6 +5,7 @@ import { TouristPlace, Hotel, Restaurant, TaxiService, Review } from '../../type
 import { TaxiBookingModal } from '../../components/booking/TaxiBookingModal';
 import { ReviewModal } from '../../components/modals/ReviewModal';
 import { IndianMonumentsSkyline } from '../../components/common/IndianMonumentsSkyline';
+import { SafeImage } from '../../components/common/SafeImage';
 import { useAuth } from '../../context/AuthContext';
 import {
   MapPin,
@@ -155,10 +156,11 @@ export const PlaceDetailPage: React.FC = () => {
       <div className="bg-white rounded-3xl overflow-hidden border border-slate-200/80 shadow-sm">
         {/* Active Hero Image Viewport */}
         <div className="relative h-80 sm:h-[420px] w-full group overflow-hidden bg-slate-950">
-          <img
+          <SafeImage
             src={currentPhoto}
             alt={place.name}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            category="place"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent"></div>
 
@@ -239,7 +241,7 @@ export const PlaceDetailPage: React.FC = () => {
                   activePhotoIdx === idx ? 'border-[#F9C74F] ring-2 ring-[#F9C74F]/40 scale-105' : 'border-transparent opacity-70 hover:opacity-100'
                 }`}
               >
-                <img src={photo} alt={`${place.name} view ${idx + 1}`} className="w-full h-full object-cover" />
+                <SafeImage src={photo} alt={`${place.name} view ${idx + 1}`} className="w-full h-full object-cover" category="place" />
               </button>
             ))}
           </div>
@@ -412,10 +414,11 @@ export const PlaceDetailPage: React.FC = () => {
 
           {/* Main Lightbox Image View */}
           <div className="relative flex-1 flex items-center justify-center my-4 overflow-hidden">
-            <img
+            <SafeImage
               src={currentPhoto}
               alt={place.name}
               className="max-h-full max-w-full object-contain rounded-2xl shadow-2xl"
+              category="place"
             />
 
             {allPhotos.length > 1 && (
@@ -446,7 +449,7 @@ export const PlaceDetailPage: React.FC = () => {
                   activePhotoIdx === idx ? 'border-[#F9C74F] scale-110' : 'border-transparent opacity-50 hover:opacity-100'
                 }`}
               >
-                <img src={photo} alt="" className="w-full h-full object-cover" />
+                <SafeImage src={photo} alt="" className="w-full h-full object-cover" category="place" />
               </button>
             ))}
           </div>
@@ -474,10 +477,11 @@ export const PlaceDetailPage: React.FC = () => {
                 className="bg-white rounded-2xl overflow-hidden border border-slate-200/80 shadow-xs card-hover flex flex-col justify-between"
               >
                 <div className="relative h-44">
-                  <img
+                  <SafeImage
                     src={hotel.photos?.[0] || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=80'}
                     alt={hotel.name}
                     className="w-full h-full object-cover"
+                    category="hotel"
                   />
                   <span className="absolute bottom-2 right-2 bg-white text-slate-900 text-xs font-bold px-2 py-0.5 rounded-full shadow-xs">
                     ₹{hotel.price_per_night} / night
@@ -518,10 +522,11 @@ export const PlaceDetailPage: React.FC = () => {
                 className="bg-white rounded-2xl overflow-hidden border border-slate-200/80 shadow-xs card-hover flex flex-col justify-between"
               >
                 <div className="relative h-44">
-                  <img
+                  <SafeImage
                     src={rest.photos?.[0] || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=80'}
                     alt={rest.name}
                     className="w-full h-full object-cover"
+                    category="restaurant"
                   />
                   <span className="absolute bottom-2 right-2 bg-emerald-600 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-xs">
                     ₹{rest.avg_cost_for_two} for two

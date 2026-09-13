@@ -15,6 +15,7 @@ import {
   MapPin
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { SafeImage } from '../../components/common/SafeImage';
 
 export const AdminPlacesPage: React.FC = () => {
   const [places, setPlaces] = useState<any[]>([]);
@@ -251,10 +252,11 @@ export const AdminPlacesPage: React.FC = () => {
                 <tr key={place.id} className="hover:bg-slate-800/40 transition">
                   <td className="py-3 px-4">
                     <div className="flex items-center space-x-3">
-                      <img
+                      <SafeImage
                         src={place.gallery?.[0] || 'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=800&q=80'}
                         alt={place.name}
                         className="w-10 h-10 rounded-lg object-cover bg-slate-800 flex-shrink-0"
+                        category="place"
                       />
                       <div>
                         <div className="font-bold text-white text-sm">{place.name}</div>
