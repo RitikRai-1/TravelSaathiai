@@ -12,6 +12,7 @@ export const RestaurantsPage: React.FC = () => {
 
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedCuisine, setSelectedCuisine] = useState('All');
+  const [selectedDiet, setSelectedDiet] = useState<'all' | 'veg' | 'non_veg'>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
   const cuisines = ['All', 'Mughlai', 'Rajasthani', 'South Indian', 'Street Food', 'Coastal', 'Italian'];
@@ -27,6 +28,7 @@ export const RestaurantsPage: React.FC = () => {
     const params: Record<string, any> = {};
     if (selectedCity) params.city_id = selectedCity;
     if (selectedCuisine !== 'All') params.cuisine = selectedCuisine;
+    if (selectedDiet !== 'all') params.food_type = selectedDiet;
     if (searchQuery) params.search = searchQuery;
 
     api.getRestaurants(params)
@@ -34,7 +36,7 @@ export const RestaurantsPage: React.FC = () => {
         if (res.success) setRestaurants(res.data);
       })
       .finally(() => setLoading(false));
-  }, [selectedCity, selectedCuisine, searchQuery]);
+  }, [selectedCity, selectedCuisine, selectedDiet, searchQuery]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
@@ -59,21 +61,61 @@ export const RestaurantsPage: React.FC = () => {
         </Link>
       </div>
 
-      {/* Cuisines Filter */}
-      <div className="flex items-center space-x-2 overflow-x-auto pb-2 scrollbar-none">
-        {cuisines.map((c) => (
+      {/* Cuisines & Diet Filter Bar */}
+      <div className="space-y-3">
+        {/* Dietary Preference Tabs */}
+        <div className="flex items-center space-x-2">
+          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider mr-1">Diet:</span>
           <button
-            key={c}
-            onClick={() => setSelectedCuisine(c)}
-            className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer ${
-              selectedCuisine === c
+            onClick={() => setSelectedDiet('all')}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition ${
+              selectedDiet === 'all'
                 ? 'bg-[#1B5E20] text-white shadow-xs'
                 : 'bg-white border border-slate-200 text-slate-700 hover:bg-emerald-50'
             }`}
           >
-            {c}
+            All Diets
           </button>
-        ))}
+          <button
+            onClick={() => setSelectedDiet('veg')}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1 ${
+              selectedDiet === 'veg'
+                ? 'bg-emerald-700 text-white shadow-xs ring-2 ring-emerald-400/40'
+                : 'bg-emerald-50/70 border border-emerald-300 text-emerald-800 hover:bg-emerald-100'
+            }`}
+          >
+            <span>🥬</span>
+            <span>Pure Veg Only</span>
+          </button>
+          <button
+            onClick={() => setSelectedDiet('non_veg')}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1 ${
+              selectedDiet === 'non_veg'
+                ? 'bg-amber-700 text-white shadow-xs ring-2 ring-amber-400/40'
+                : 'bg-amber-50/70 border border-amber-300 text-amber-800 hover:bg-amber-100'
+            }`}
+          >
+            <span>🍗</span>
+            <span>Non-Veg Specialties</span>
+          </button>
+        </div>
+
+        {/* Cuisines Filter */}
+        <div className="flex items-center space-x-2 overflow-x-auto pb-2 scrollbar-none">
+          {cuisines.map((c) => (
+            <button
+              key={c}
+              onClick={() => setSelectedCuisine(c)}
+              className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer ${
+                selectedCuisine === c
+                  ? 'bg-[#1B5E20] text-white shadow-xs'
+                  : 'bg-white border border-slate-200 text-slate-700 hover:bg-emerald-50'
+              }`}
+            >
+              {c}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Search & City Filter Bar */}
@@ -125,9 +167,30 @@ export const RestaurantsPage: React.FC = () => {
                     alt={rest.name}
                     className="w-full h-full object-cover"
                   />
-                  <span className="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-xs text-white text-xs font-bold px-2.5 py-1 rounded-full">
-                    {rest.city_name}
-                  </span>
+                  <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+                    <span className="bg-slate-900/80 backdrop-blur-xs text-white text-xs font-bold px-2.5 py-1 rounded-full">
+                      {rest.city_name}
+                    </span>
+                    {/* Food Type Badge */}
+                    {rest.food_type === 'veg' && (
+                      <span className="bg-emerald-600/90 backdrop-blur-xs text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow-xs flex items-center space-x-1">
+                        <span>🥬</span>
+                        <span>Vegetarian</span>
+                      </span>
+                    )}
+                    {rest.food_type === 'non_veg' && (
+                      <span className="bg-amber-600/90 backdrop-blur-xs text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow-xs flex items-center space-x-1">
+                        <span>🍗</span>
+                        <span>Non-Veg</span>
+                      </span>
+                    )}
+                    {rest.food_type === 'both' && (
+                      <span className="bg-teal-700/90 backdrop-blur-xs text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow-xs flex items-center space-x-1">
+                        <span>🥬🍗</span>
+                        <span>Veg & Non-Veg</span>
+                      </span>
+                    )}
+                  </div>
                   {rest.photos && rest.photos.length > 1 && (
                     <span className="absolute top-3 right-3 bg-black/60 backdrop-blur-xs text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center space-x-1">
                       <span>📸</span>
@@ -140,7 +203,15 @@ export const RestaurantsPage: React.FC = () => {
                 </div>
 
                 <div className="p-5 space-y-2">
-                  <span className="text-[10px] font-bold text-[#1B5E20] uppercase tracking-wider">{rest.cuisine}</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-[#1B5E20] uppercase tracking-wider">{rest.cuisine}</span>
+                    {rest.rating && (
+                      <span className="flex items-center space-x-1 text-xs font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                        <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
+                        <span>{rest.rating}</span>
+                      </span>
+                    )}
+                  </div>
                   <h3 className="font-bold text-base text-slate-900 font-heading">{rest.name}</h3>
                   <p className="text-xs text-slate-500 line-clamp-2">
                     Popular: {rest.popular_dishes?.join(', ')}

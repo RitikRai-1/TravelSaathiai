@@ -514,15 +514,99 @@ export const TripPlannerPage: React.FC = () => {
                       </button>
                     ))}
                   </div>
+                </div>
+              )}
+
+              {/* STEP 8: FOOD PREFERENCE */}
+              {currentStep === 8 && (
+                <div className="space-y-5">
+                  <div>
+                    <h3 className="text-lg font-bold text-[#0B192C] font-heading">{t('foodPreferenceTitle', "What's your food preference?")}</h3>
+                    <p className="text-xs text-slate-500">{t('foodPreferenceSub', 'We will customize restaurant recommendations and itinerary meal stops to your diet.')}</p>
+                  </div>
+
+                  {/* Two Clear Options: 🥬 VEGETARIAN / 🍗 NON-VEGETARIAN */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setStepError('');
+                        setFoodPreference('veg');
+                      }}
+                      className={`p-5 rounded-2xl border text-left transition flex flex-col justify-between relative group ${
+                        foodPreference === 'veg'
+                          ? 'bg-emerald-50/70 border-emerald-600 ring-2 ring-emerald-600/30 shadow-md'
+                          : 'bg-white border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/20'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between w-full">
+                        <div className="w-12 h-12 rounded-2xl bg-emerald-100 flex items-center justify-center text-2xl shadow-xs">
+                          🥬
+                        </div>
+                        {foodPreference === 'veg' && (
+                          <span className="px-2.5 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-bold uppercase tracking-wider">
+                            Selected
+                          </span>
+                        )}
+                      </div>
+                      <div className="mt-4">
+                        <h4 className="text-base font-bold text-emerald-950 font-heading flex items-center space-x-1.5">
+                          <span>VEGETARIAN</span>
+                        </h4>
+                        <p className="text-xs text-slate-600 mt-1">
+                          Pure veg restaurants, Sattvic/Jain thalis, and veg-friendly culinary gems. Strictly excludes meat & poultry.
+                        </p>
+                      </div>
+                      <div className="mt-3 pt-3 border-t border-emerald-100 text-[11px] font-semibold text-emerald-700 flex items-center space-x-1">
+                        <span>✓ Pure Veg & Veg-Friendly Stops</span>
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setStepError('');
+                        setFoodPreference('non_veg');
+                      }}
+                      className={`p-5 rounded-2xl border text-left transition flex flex-col justify-between relative group ${
+                        foodPreference === 'non_veg'
+                          ? 'bg-amber-50/70 border-amber-600 ring-2 ring-amber-600/30 shadow-md'
+                          : 'bg-white border-slate-200 hover:border-amber-300 hover:bg-amber-50/20'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between w-full">
+                        <div className="w-12 h-12 rounded-2xl bg-amber-100 flex items-center justify-center text-2xl shadow-xs">
+                          🍗
+                        </div>
+                        {foodPreference === 'non_veg' && (
+                          <span className="px-2.5 py-0.5 rounded-full bg-amber-600 text-white text-[10px] font-bold uppercase tracking-wider">
+                            Selected
+                          </span>
+                        )}
+                      </div>
+                      <div className="mt-4">
+                        <h4 className="text-base font-bold text-amber-950 font-heading flex items-center space-x-1.5">
+                          <span>NON-VEGETARIAN</span>
+                        </h4>
+                        <p className="text-xs text-slate-600 mt-1">
+                          Authentic Mughlai, coastal curries, succulent kebabs, regional non-veg specialties and multi-cuisine hubs.
+                        </p>
+                      </div>
+                      <div className="mt-3 pt-3 border-t border-amber-100 text-[11px] font-semibold text-amber-700 flex items-center space-x-1">
+                        <span>✓ Meat, Poultry, Seafood & Multi-Cuisine</span>
+                      </div>
+                    </button>
+                  </div>
 
                   {/* Trip Specifications Summary */}
                   <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-xs space-y-1.5 mt-4">
                     <span className="font-bold text-[#0B192C] uppercase tracking-wider text-[10px]">{t('tripSpecifications', 'Trip Specifications:')}</span>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-slate-600">
+                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-slate-600">
                       <div>{t('destinationLabel', 'Destination:')} <span className="font-bold text-[#0B192C]">{selectedCityObj?.name}</span></div>
                       <div>{t('durationLabel', 'Duration:')} <span className="font-bold text-[#0B192C]">{daysCount} {daysCount === 1 ? t('dayUnit', 'Day') : t('daysUnit', 'Days')}</span></div>
                       <div>{t('targetBudgetLabel', 'Budget Target:')} <span className="font-bold text-[#0F766E]">₹{budgetTarget.toLocaleString('en-IN')}</span></div>
                       <div>{t('transportModeLabel', 'Mode:')} <span className="font-bold text-[#0B192C]">{transportMode}</span></div>
+                      <div>Diet: <span className="font-bold text-[#0F766E]">{foodPreference === 'veg' ? '🥬 Vegetarian' : '🍗 Non-Veg'}</span></div>
                     </div>
                   </div>
 
@@ -565,7 +649,7 @@ export const TripPlannerPage: React.FC = () => {
                   <div></div>
                 )}
 
-                {currentStep < 7 ? (
+                {currentStep < 8 ? (
                   <button
                     type="button"
                     onClick={() => {
@@ -597,6 +681,10 @@ export const TripPlannerPage: React.FC = () => {
                         setStepError('Please select at least 1 travel interest.');
                         return;
                       }
+                      if (currentStep === 7 && !travellerType) {
+                        setStepError('Please select who you are travelling with.');
+                        return;
+                      }
                       setCurrentStep(currentStep + 1);
                     }}
                     className="px-6 py-2.5 bg-[#0F766E] hover:bg-[#0D5E57] text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center space-x-1"
@@ -609,8 +697,8 @@ export const TripPlannerPage: React.FC = () => {
                     type="button"
                     onClick={() => {
                       setStepError('');
-                      if (!travellerType) {
-                        setStepError('Please select who you are travelling with.');
+                      if (!foodPreference) {
+                        setStepError('Please select your food preference (Vegetarian or Non-Vegetarian).');
                         return;
                       }
                       handleGenerate();

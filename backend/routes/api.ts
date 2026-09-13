@@ -326,12 +326,22 @@ router.post('/ai/chat', async (req: Request, res: Response) => {
       detectedDays = 2;
     }
 
+    // 5. Food Preference Extraction:
+    let detectedFoodPref: 'veg' | 'non_veg' | null = null;
+    const lowerConv = fullConversationText.toLowerCase();
+    if (lowerConv.includes('non-veg') || lowerConv.includes('non veg') || lowerConv.includes('chicken') || lowerConv.includes('mutton') || lowerConv.includes('meat') || lowerConv.includes('fish') || lowerConv.includes('seafood')) {
+      detectedFoodPref = 'non_veg';
+    } else if (lowerConv.includes('pure veg') || lowerConv.includes('vegetarian') || lowerConv.includes('veg ') || lowerConv.includes('veg,')) {
+      detectedFoodPref = 'veg';
+    }
+
     // Summary Context Header to confirm multi-turn memory
     const contextItems: string[] = [];
     if (matchedCity) contextItems.push(`📍 **${matchedCity.name}**`);
     if (detectedBudget) contextItems.push(`💰 **₹${detectedBudget.toLocaleString('en-IN')}**`);
     if (detectedTravellers) contextItems.push(`👥 **${detectedTravellers.type}**`);
     if (detectedDays) contextItems.push(`🗓️ **${detectedDays} Days**`);
+    if (detectedFoodPref) contextItems.push(detectedFoodPref === 'veg' ? '🥬 **Vegetarian**' : '🍗 **Non-Veg**');
 
     const contextHeader = contextItems.length > 0
       ? `*(Current Session: ${contextItems.join(' • ')})*\n\n`
@@ -365,18 +375,25 @@ router.post('/ai/chat', async (req: Request, res: Response) => {
         reply = `${contextHeader}Which city would you like hotel recommendations for? We cover 16+ destinations including **Jaipur, Udaipur, Agra, Varanasi, Goa, Manali, and Srinagar**.`;
         suggestions = ['Hotels in Jaipur', 'Hotels in Udaipur', 'Hotels in Goa', 'Hotels in Manali'];
       }
-    } else if (currentLower.includes('restaurant') || currentLower.includes('food') || currentLower.includes('eat') || currentLower.includes('dhaba') || currentLower.includes('dish')) {
+    } else if (currentLower.includes('restaurant') || currentLower.includes('food') || currentLower.includes('eat') || currentLower.includes('dhaba') || currentLower.includes('dish') || currentLower.includes('veg') || currentLower.includes('dining')) {
       if (matchedCity) {
-        const restaurants = dbManager.query<any>(
-          'SELECT name, cuisine, avg_cost_for_two, popular_dishes_json FROM restaurants WHERE city_id = ? AND approval_status = "APPROVED" ORDER BY rating DESC LIMIT 3',
-          [matchedCity.id]
-        );
+        let restSql = 'SELECT name, cuisine, food_type, avg_cost_for_two, popular_dishes_json FROM restaurants WHERE city_id = ? AND approval_status = "APPROVED"';
+        const restParams: any[] = [matchedCity.id];
+        if (detectedFoodPref === 'veg') {
+          restSql += ' AND (food_type = "veg" OR food_type = "both")';
+        } else if (detectedFoodPref === 'non_veg') {
+          restSql += ' AND (food_type = "non_veg" OR food_type = "both")';
+        }
+        restSql += ' ORDER BY rating DESC LIMIT 3';
+        const restaurants = dbManager.query<any>(restSql, restParams);
         const groupCount = detectedTravellers ? detectedTravellers.count : 2;
-        reply = `${contextHeader}Here are top culinary highlights in **${matchedCity.name}** for ${groupCount} travellers:\n\n` +
+        const dietLabel = detectedFoodPref === 'veg' ? 'Pure Veg & Veg-friendly' : detectedFoodPref === 'non_veg' ? 'Non-Vegetarian & Multi-Cuisine' : 'Culinary';
+        reply = `${contextHeader}Here are top **${dietLabel}** highlights in **${matchedCity.name}** for ${groupCount} travellers:\n\n` +
           restaurants.map((r: any) => {
             const dishes = JSON.parse(r.popular_dishes_json || '[]').slice(0, 3).join(', ');
             const groupCost = Math.round((r.avg_cost_for_two / 2) * groupCount);
-            return `🍽️ **${r.name}** — ${r.cuisine}\n   • Must Try: ${dishes || 'Regional Thali'}\n   • Approx Cost: ₹${groupCost.toLocaleString('en-IN')} for ${groupCount} people (₹${r.avg_cost_for_two} for two)`;
+            const badge = r.food_type === 'veg' ? '🥬 [Veg]' : r.food_type === 'non_veg' ? '🍗 [Non-Veg]' : '🥬🍗 [Veg & Non-Veg]';
+            return `🍽️ **${r.name}** ${badge} — ${r.cuisine}\n   • Must Try: ${dishes || 'Regional Thali'}\n   • Approx Cost: ₹${groupCost.toLocaleString('en-IN')} for ${groupCount} people (₹${r.avg_cost_for_two} for two)`;
           }).join('\n\n') +
           `\n\nMust savor authentic local flavours!`;
 

@@ -212,6 +212,24 @@ export const RestaurantDetailPage: React.FC = () => {
               <span className="bg-[#2DD4BF] text-[#0B192C] text-xs font-bold px-3 py-1 rounded-full shadow-xs">
                 {restaurant.cuisine}
               </span>
+              {restaurant.food_type === 'veg' && (
+                <span className="bg-emerald-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-xs flex items-center space-x-1">
+                  <span>🥬</span>
+                  <span>Pure Vegetarian</span>
+                </span>
+              )}
+              {restaurant.food_type === 'non_veg' && (
+                <span className="bg-amber-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-xs flex items-center space-x-1">
+                  <span>🍗</span>
+                  <span>Non-Vegetarian</span>
+                </span>
+              )}
+              {restaurant.food_type === 'both' && (
+                <span className="bg-teal-700 text-white text-xs font-bold px-3 py-1 rounded-full shadow-xs flex items-center space-x-1">
+                  <span>🥬🍗</span>
+                  <span>Veg &amp; Non-Veg</span>
+                </span>
+              )}
               <span className="bg-[#FF6B35] text-white text-xs font-bold px-2.5 py-1 rounded-full flex items-center space-x-1 shadow-xs">
                 <Star className="w-3.5 h-3.5 fill-current" />
                 <span>{restaurant.rating} / 5</span>
@@ -318,7 +336,11 @@ export const RestaurantDetailPage: React.FC = () => {
           </div>
           <h4 className="font-bold text-sm text-slate-900 font-heading">Dietary &amp; Food Quality</h4>
           <p className="text-xs text-slate-600 leading-relaxed">
-            Pure vegetarian and customized Jain options prepared upon request with authentic locally sourced ingredients.
+            {restaurant.food_type === 'veg'
+              ? '100% Pure Vegetarian dining with zero non-veg preparation. Specialized Sattvic & Jain thalis prepared upon request.'
+              : restaurant.food_type === 'non_veg'
+              ? 'Authentic non-vegetarian cuisine with rich gravies, succulent tandoor specials, and coastal curries.'
+              : 'Multi-cuisine menu with dedicated vegetarian and non-vegetarian selections prepared according to traditional culinary standards.'}
           </p>
         </div>
 

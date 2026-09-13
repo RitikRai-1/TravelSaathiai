@@ -3,7 +3,7 @@ import { dbManager } from '../db/database';
 
 export const getRestaurants = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { city_id, cuisine, max_cost, min_rating, search, featured } = req.query;
+    const { city_id, cuisine, food_type, max_cost, min_rating, search, featured } = req.query;
 
     let sql = `
       SELECT r.*, c.name as city_name, s.name as state_name
@@ -17,6 +17,17 @@ export const getRestaurants = async (req: Request, res: Response): Promise<void>
     if (city_id) {
       sql += ' AND r.city_id = ?';
       params.push(city_id);
+    }
+
+    if (food_type) {
+      if (food_type === 'veg') {
+        sql += " AND (r.food_type = 'veg' OR r.food_type = 'both')";
+      } else if (food_type === 'non_veg') {
+        sql += " AND (r.food_type = 'non_veg' OR r.food_type = 'both')";
+      } else {
+        sql += ' AND r.food_type = ?';
+        params.push(food_type);
+      }
     }
 
     if (cuisine) {

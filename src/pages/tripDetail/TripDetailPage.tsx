@@ -494,7 +494,7 @@ export const TripDetailPage: React.FC = () => {
 
   // Helper for restaurant cards per day and slot
   const getRestaurantForSlot = (dayNumber: number, slot: 'lunch' | 'dinner') => {
-    const allDining = (cityRestaurants && cityRestaurants.length > 0)
+    const rawDining = (cityRestaurants && cityRestaurants.length > 0)
       ? cityRestaurants
       : (trip.recommendedRestaurants && trip.recommendedRestaurants.length > 0)
         ? trip.recommendedRestaurants
@@ -503,6 +503,7 @@ export const TripDetailPage: React.FC = () => {
               id: 201,
               name: `${trip.city.name} Heritage Rasoi & Thali`,
               cuisine: 'Traditional Regional & North Indian Thali',
+              food_type: 'veg',
               rating: 4.8,
               avg_cost_for_two: 550,
               photos: ['https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1000&q=80'],
@@ -513,16 +514,18 @@ export const TripDetailPage: React.FC = () => {
               id: 202,
               name: `${trip.city.name} Grand Darbar Grill & Cuisine`,
               cuisine: 'Mughlai, North Indian & Kebabs',
+              food_type: 'both',
               rating: 4.7,
               avg_cost_for_two: 750,
               photos: ['https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1000&q=80'],
-              popular_dishes: ['Paneer Tikka', 'Shahi Paneer / Butter Gravy', 'Garlic Naan', 'Phirni'],
+              popular_dishes: ['Paneer Tikka', 'Chicken Tikka', 'Garlic Naan', 'Phirni'],
               description: 'Acclaimed family-friendly restaurant with ambient evening lightning, courtyard seating, and live instrumental tunes.'
             },
             {
               id: 203,
               name: `${trip.city.name} Organic Haveli Bhojanalaya`,
               cuisine: 'Pure Veg Traditional & Satvik',
+              food_type: 'veg',
               rating: 4.9,
               avg_cost_for_two: 450,
               photos: ['https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1000&q=80'],
@@ -530,6 +533,18 @@ export const TripDetailPage: React.FC = () => {
               description: 'Pure vegetarian dining hub celebrating rural culinary traditions, handmade rotis, and clay-pot preparations.'
             }
           ];
+
+    // Filter dining pool strictly according to trip foodPreference
+    const isVeg = trip.foodPreference === 'veg';
+    const isNonVeg = trip.foodPreference === 'non_veg';
+    const filteredDining = rawDining.filter((r: any) => {
+      const ft = r.food_type || 'both';
+      if (isVeg) return ft === 'veg' || ft === 'both';
+      if (isNonVeg) return ft === 'non_veg' || ft === 'both';
+      return true;
+    });
+
+    const allDining = filteredDining.length > 0 ? filteredDining : rawDining;
 
     const idx = slot === 'lunch' ? ((dayNumber - 1) * 2) % allDining.length : ((dayNumber - 1) * 2 + 1) % allDining.length;
     const dining = allDining[idx] || allDining[0];
@@ -574,6 +589,15 @@ export const TripDetailPage: React.FC = () => {
               <span className="bg-white/20 backdrop-blur-md text-white text-xs font-semibold px-3 py-1 rounded-full">
                 {trip.daysCount} {trip.daysCount === 1 ? t('dayUnit', 'Day') : t('daysUnit', 'Days')} • {trip.travellersCount} {trip.travellersCount === 1 ? 'Traveller' : 'Travellers'}
               </span>
+              {trip.foodPreference && (
+                <span className={`backdrop-blur-md text-xs font-semibold px-3 py-1 rounded-full flex items-center space-x-1 ${
+                  trip.foodPreference === 'veg'
+                    ? 'bg-emerald-500/30 text-emerald-200 border border-emerald-400/40'
+                    : 'bg-amber-500/30 text-amber-200 border border-amber-400/40'
+                }`}>
+                  <span>{trip.foodPreference === 'veg' ? '🥬 Vegetarian Diet' : '🍗 Non-Vegetarian Diet'}</span>
+                </span>
+              )}
             </div>
 
             <h1 className="text-2xl sm:text-4xl font-bold font-heading">{trip.title}</h1>
@@ -1829,6 +1853,21 @@ export const TripDetailPage: React.FC = () => {
                                     <Utensils className="w-3 h-3" />
                                     <span>{t('aiLunchTitle', 'AI Lunch Recommendation')}</span>
                                   </span>
+                                  {lunch.dining.food_type === 'veg' && (
+                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                      🥬 Vegetarian
+                                    </span>
+                                  )}
+                                  {lunch.dining.food_type === 'non_veg' && (
+                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                                      🍗 Non-Vegetarian
+                                    </span>
+                                  )}
+                                  {lunch.dining.food_type === 'both' && (
+                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-100 text-teal-800 border border-teal-300">
+                                      🥬🍗 Veg & Non-Veg
+                                    </span>
+                                  )}
                                   <span className="text-xs font-semibold text-[#0F766E]">{lunch.dining.cuisine}</span>
                                 </div>
                                 <div className="flex items-center space-x-3 text-xs">
@@ -1900,6 +1939,21 @@ export const TripDetailPage: React.FC = () => {
                                     <Utensils className="w-3 h-3" />
                                     <span>{t('aiDinnerTitle', 'AI Dinner Recommendation')}</span>
                                   </span>
+                                  {dinner.dining.food_type === 'veg' && (
+                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                      🥬 Vegetarian
+                                    </span>
+                                  )}
+                                  {dinner.dining.food_type === 'non_veg' && (
+                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                                      🍗 Non-Vegetarian
+                                    </span>
+                                  )}
+                                  {dinner.dining.food_type === 'both' && (
+                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-100 text-teal-800 border border-teal-300">
+                                      🥬🍗 Veg & Non-Veg
+                                    </span>
+                                  )}
                                   <span className="text-xs font-semibold text-[#0F766E]">{dinner.dining.cuisine}</span>
                                 </div>
                                 <div className="flex items-center space-x-3 text-xs">
