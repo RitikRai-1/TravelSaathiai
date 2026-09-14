@@ -99,6 +99,40 @@ async function runE2EVerification() {
   console.log(`   - Recommended Hidden Gems: ${trip.recommendedHiddenGems?.length || 0} gems`);
   console.log(`   - Available Taxis: ${trip.availableTaxis?.length || 0} cabs`);
 
+  // 3B. TEST FOOD PREFERENCE FILTERING
+  console.log('\nStep 3B: Testing Strict Dietary Filtering (Veg vs Non-Veg vs Both)...');
+  // 1. Strict Veg
+  const vegTripRes = await fetch(`${BASE_URL}/trips/generate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ...genPayload, foodPreference: 'veg' }),
+  }).then((r) => r.json());
+  if (!vegTripRes.success) throw new Error('Veg trip generation failed');
+  const vegRestaurants = vegTripRes.trip.recommendedRestaurants || [];
+  const nonVegFoundInVeg = vegRestaurants.filter((r: any) => r.food_type && r.food_type !== 'veg');
+  if (nonVegFoundInVeg.length > 0) {
+    throw new Error(`Veg integrity violation: found non-veg restaurants in pure veg itinerary!`);
+  }
+  console.log(`✅ Strict Veg Test: 100% pure veg restaurants returned (${vegRestaurants.length} options)`);
+
+  // 2. Non-Veg
+  const nonVegTripRes = await fetch(`${BASE_URL}/trips/generate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ...genPayload, foodPreference: 'non_veg' }),
+  }).then((r) => r.json());
+  if (!nonVegTripRes.success) throw new Error('Non-veg trip generation failed');
+  console.log(`✅ Non-Veg Test: returned ${nonVegTripRes.trip.recommendedRestaurants?.length || 0} dining options`);
+
+  // 3. Both
+  const bothTripRes = await fetch(`${BASE_URL}/trips/generate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ...genPayload, foodPreference: 'both' }),
+  }).then((r) => r.json());
+  if (!bothTripRes.success) throw new Error('Both food preference trip generation failed');
+  console.log(`✅ Both Test: returned ${bothTripRes.trip.recommendedRestaurants?.length || 0} balanced dining options`);
+
   // 4. AUTHENTICATION & SAVE TRIP
   console.log('\nStep 4: Authenticating User & Saving Trip to Portfolio...');
   let loginRes = await fetch(`${BASE_URL}/auth/login`, {
@@ -177,6 +211,7 @@ async function runE2EVerification() {
   console.log(`   - Hotels: ${searchRes.data.hotels.length}`);
   console.log(`   - Restaurants: ${searchRes.data.restaurants.length}`);
   console.log(`   - Hidden Gems: ${searchRes.data.hiddenGems.length}`);
+  console.log(`   - Taxis: ${searchRes.data.taxis?.length || 0}`);
 
   // 7. AI ASSISTANT CHATBOT
   console.log('\nStep 7: Testing TravelSaathi AI Assistant...');
