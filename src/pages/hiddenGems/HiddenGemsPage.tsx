@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../services/api';
 import { HiddenGem } from '../../types';
-import { Eye, MapPin, Clock, Star, Compass, ArrowRight, Sparkles } from 'lucide-react';
+import { Eye, MapPin, Clock, Star, Compass, ArrowRight, Sparkles, Hotel, Utensils, Car } from 'lucide-react';
 import { IndianMonumentsSkyline } from '../../components/common/IndianMonumentsSkyline';
 import { SafeImage } from '../../components/common/SafeImage';
 
@@ -137,14 +137,41 @@ export const HiddenGemsPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="p-6 pt-0">
+              <div className="p-6 pt-0 space-y-2">
                 <Link
                   to={`/plan-trip?city=${gem.city_id}`}
-                  className="w-full py-3 bg-[#1B5E20] hover:bg-[#154a19] text-white rounded-xl text-center text-xs font-bold transition flex items-center justify-center space-x-1.5"
+                  className="w-full py-2.5 bg-[#1B5E20] hover:bg-[#154a19] text-white rounded-xl text-center text-xs font-bold transition flex items-center justify-center space-x-1.5 shadow-xs"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-[#F9C74F]" />
                   <span>Include in Trip Itinerary</span>
                 </Link>
+
+                <div className="grid grid-cols-3 gap-1.5 pt-1">
+                  <Link
+                    to={`/hotels?city_id=${gem.city_id}`}
+                    className="p-1.5 rounded-lg bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-[#1B5E20] text-[10px] font-semibold flex items-center justify-center space-x-1 transition text-center"
+                    title="Nearby Stays"
+                  >
+                    <Hotel className="w-3 h-3 text-[#1B5E20]" />
+                    <span>Hotels</span>
+                  </Link>
+                  <Link
+                    to={`/restaurants?city_id=${gem.city_id}`}
+                    className="p-1.5 rounded-lg bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-[#1B5E20] text-[10px] font-semibold flex items-center justify-center space-x-1 transition text-center"
+                    title="Nearby Dining"
+                  >
+                    <Utensils className="w-3 h-3 text-amber-600" />
+                    <span>Food</span>
+                  </Link>
+                  <Link
+                    to={`/taxis?city_id=${gem.city_id}`}
+                    className="p-1.5 rounded-lg bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-[#1B5E20] text-[10px] font-semibold flex items-center justify-center space-x-1 transition text-center"
+                    title="Nearby Cabs"
+                  >
+                    <Car className="w-3 h-3 text-teal-600" />
+                    <span>Taxis</span>
+                  </Link>
+                </div>
               </div>
             </div>
           ))}

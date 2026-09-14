@@ -65,7 +65,7 @@ export const api = {
     const query = new URLSearchParams(params).toString();
     return request<{ success: boolean; data: any[] }>(`/hidden-gems?${query}`);
   },
-  search: (q: string) => request<{ success: boolean; data: any }>(`/search?q=${encodeURIComponent(q)}`),
+  search: (q: string, cityId?: string | number) => request<{ success: boolean; data: any }>(`/search?q=${encodeURIComponent(q)}${cityId ? `&city_id=${cityId}` : ''}`),
 
   // Hotels
   getHotels: (params: Record<string, any> = {}) => {

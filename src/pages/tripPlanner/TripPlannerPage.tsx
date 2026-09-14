@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { api } from '../../services/api';
 import { City } from '../../types';
 import { useLanguage } from '../../context/LanguageContext';
@@ -35,11 +35,14 @@ const BUDGET_PRESETS = [
 const DAYS_PRESETS = [1, 2, 3, 4, 5, 7, 10];
 
 const TRANSPORT_MODES = [
-  { name: 'Self / Own Vehicle', icon: '🚗', desc: 'Personal car or bike road trip with highway routes, tolls & fuel advice' },
+  { name: 'Own Car', icon: '🚗', desc: 'Personal or rental car road trip with highway routes, tolls & fuel advice' },
+  { name: 'Bike', icon: '🏍️', desc: 'Two-wheeler motorcycle adventure through scenic mountain or coastal roads' },
   { name: 'Bus', icon: '🚌', desc: 'Intercity AC Volvo and state tourism bus connectivity' },
   { name: 'Train', icon: '🚆', desc: 'Indian Railways superfast & express connected travel' },
   { name: 'Flight', icon: '✈️', desc: 'Airport transfers and express air travel' },
   { name: 'Taxi', icon: '🚕', desc: 'Pre-calculated local cab fares and private sightseeing' },
+  { name: 'Local Transport', icon: '🛺', desc: 'Metro, auto rickshaws, and e-rickshaws for authentic city exploration' },
+  { name: 'Self / Own Vehicle', icon: '🚙', desc: 'Personal vehicle road trip with highway routes & parking tips' },
 ];
 
 const INTERESTS_LIST = [
@@ -65,6 +68,7 @@ const TRAVEL_WITH_LIST = [
 
 export const TripPlannerPage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const { t } = useLanguage();
 
@@ -73,8 +77,13 @@ export const TripPlannerPage: React.FC = () => {
 
   // Form State
   const [currentStep, setCurrentStep] = useState(1);
+  const stateCityId = (location.state as any)?.defaultCityId;
   const [selectedCityId, setSelectedCityId] = useState<number | null>(
-    searchParams.get('city') ? Number(searchParams.get('city')) : null
+    searchParams.get('city')
+      ? Number(searchParams.get('city'))
+      : stateCityId
+      ? Number(stateCityId)
+      : null
   );
   const [citySearch, setCitySearch] = useState('');
   const [budgetTarget, setBudgetTarget] = useState<number>(25000);
@@ -85,7 +94,7 @@ export const TripPlannerPage: React.FC = () => {
   const [transportMode, setTransportMode] = useState<string>('Self / Own Vehicle');
   const [selectedInterests, setSelectedInterests] = useState<string[]>(['History', 'Food', 'Culture']);
   const [travellerType, setTravellerType] = useState<string>('Couple');
-  const [foodPreference, setFoodPreference] = useState<'veg' | 'non_veg'>('veg');
+  const [foodPreference, setFoodPreference] = useState<'veg' | 'non_veg' | 'both'>('veg');
   const [stepError, setStepError] = useState<string>('');
 
   // Generating State
@@ -526,8 +535,8 @@ export const TripPlannerPage: React.FC = () => {
                     <p className="text-xs text-slate-500">{t('foodPreferenceSub', 'We will customize restaurant recommendations and itinerary meal stops to your diet.')}</p>
                   </div>
 
-                  {/* Two Clear Options: 🥬 VEGETARIAN / 🍗 NON-VEGETARIAN */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Three Clear Options: 🥬 VEGETARIAN / 🍗 NON-VEGETARIAN / 🥬🍗 BOTH */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <button
                       type="button"
                       onClick={() => {
@@ -597,6 +606,41 @@ export const TripPlannerPage: React.FC = () => {
                         <span>✓ Meat, Poultry, Seafood & Multi-Cuisine</span>
                       </div>
                     </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setStepError('');
+                        setFoodPreference('both');
+                      }}
+                      className={`p-5 rounded-2xl border text-left transition flex flex-col justify-between relative group ${
+                        foodPreference === 'both'
+                          ? 'bg-teal-50/70 border-teal-600 ring-2 ring-teal-600/30 shadow-md'
+                          : 'bg-white border-slate-200 hover:border-teal-300 hover:bg-teal-50/20'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between w-full">
+                        <div className="w-12 h-12 rounded-2xl bg-teal-100 flex items-center justify-center text-2xl shadow-xs">
+                          🥬🍗
+                        </div>
+                        {foodPreference === 'both' && (
+                          <span className="px-2.5 py-0.5 rounded-full bg-teal-600 text-white text-[10px] font-bold uppercase tracking-wider">
+                            Selected
+                          </span>
+                        )}
+                      </div>
+                      <div className="mt-4">
+                        <h4 className="text-base font-bold text-teal-950 font-heading flex items-center space-x-1.5">
+                          <span>BOTH</span>
+                        </h4>
+                        <p className="text-xs text-slate-600 mt-1">
+                          Complete flexibility: pure vegetarian specialties alongside famous regional non-veg dining spots.
+                        </p>
+                      </div>
+                      <div className="mt-3 pt-3 border-t border-teal-100 text-[11px] font-semibold text-teal-700 flex items-center space-x-1">
+                        <span>✓ Full Culinary Diversity</span>
+                      </div>
+                    </button>
                   </div>
 
                   {/* Trip Specifications Summary */}
@@ -607,7 +651,7 @@ export const TripPlannerPage: React.FC = () => {
                       <div>{t('durationLabel', 'Duration:')} <span className="font-bold text-[#0B192C]">{daysCount} {daysCount === 1 ? t('dayUnit', 'Day') : t('daysUnit', 'Days')}</span></div>
                       <div>{t('targetBudgetLabel', 'Budget Target:')} <span className="font-bold text-[#0F766E]">₹{budgetTarget.toLocaleString('en-IN')}</span></div>
                       <div>{t('transportModeLabel', 'Mode:')} <span className="font-bold text-[#0B192C]">{transportMode}</span></div>
-                      <div>Diet: <span className="font-bold text-[#0F766E]">{foodPreference === 'veg' ? '🥬 Vegetarian' : '🍗 Non-Veg'}</span></div>
+                      <div>Diet: <span className="font-bold text-[#0F766E]">{foodPreference === 'veg' ? '🥬 Vegetarian' : foodPreference === 'both' ? '🥬🍗 Veg & Non-Veg' : '🍗 Non-Veg'}</span></div>
                     </div>
                   </div>
 

@@ -317,11 +317,12 @@ export const TripDetailPage: React.FC = () => {
         budgetTarget: trip.budget.budgetTarget,
         daysCount: trip.daysCount,
         travellersCount: trip.travellersCount,
-        adultsCount: trip.travellersCount,
-        childrenCount: 0,
+        adultsCount: trip.adultsCount || trip.travellersCount,
+        childrenCount: trip.childrenCount || 0,
         transportMode: trip.transportMode,
         interests: trip.interests,
         travellerType: trip.travellerType,
+        foodPreference: trip.foodPreference,
       });
 
       if (res.success && res.trip) {
@@ -613,9 +614,11 @@ export const TripDetailPage: React.FC = () => {
                 <span className={`backdrop-blur-md text-xs font-semibold px-3 py-1 rounded-full flex items-center space-x-1 ${
                   trip.foodPreference === 'veg'
                     ? 'bg-emerald-500/30 text-emerald-200 border border-emerald-400/40'
+                    : trip.foodPreference === 'both'
+                    ? 'bg-teal-500/30 text-teal-200 border border-teal-400/40'
                     : 'bg-amber-500/30 text-amber-200 border border-amber-400/40'
                 }`}>
-                  <span>{trip.foodPreference === 'veg' ? '🥬 Vegetarian Diet' : '🍗 Non-Vegetarian Diet'}</span>
+                  <span>{trip.foodPreference === 'veg' ? '🥬 Pure Vegetarian' : trip.foodPreference === 'both' ? '🥬🍗 Veg & Non-Veg' : '🍗 Non-Vegetarian'}</span>
                 </span>
               )}
             </div>
@@ -1006,9 +1009,12 @@ export const TripDetailPage: React.FC = () => {
                       budgetTarget: newBudget,
                       daysCount: trip.daysCount,
                       travellersCount: trip.travellersCount,
+                      adultsCount: trip.adultsCount || trip.travellersCount,
+                      childrenCount: trip.childrenCount || 0,
                       transportMode: trip.transportMode,
                       interests: trip.interests,
                       travellerType: trip.travellerType as any,
+                      foodPreference: trip.foodPreference,
                     });
                     if (res.success && res.trip) {
                       setTrip(res.trip);

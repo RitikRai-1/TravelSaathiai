@@ -1,37 +1,63 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { api } from '../../services/api';
-import { Search, MapPin, Hotel, Utensils, Sparkles, Star, ArrowRight, Compass, Filter } from 'lucide-react';
+import { Search, MapPin, Hotel, Utensils, Sparkles, Star, ArrowRight, Compass, Filter, Car } from 'lucide-react';
 import { IndianMonumentsSkyline } from '../../components/common/IndianMonumentsSkyline';
 import { SafeImage } from '../../components/common/SafeImage';
+import { TaxiBookingModal } from '../../components/booking/TaxiBookingModal';
 
 export const SearchResultsPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialQuery = searchParams.get('q') || '';
+  const initialCity = searchParams.get('city_id') || '';
   const [query, setQuery] = useState(initialQuery);
-  const [activeFilter, setActiveFilter] = useState<'ALL' | 'CITIES' | 'PLACES' | 'HOTELS' | 'RESTAURANTS' | 'GEMS'>('ALL');
+  const [selectedCityId, setSelectedCityId] = useState(initialCity);
+  const [citiesList, setCitiesList] = useState<any[]>([]);
+  const [activeFilter, setActiveFilter] = useState<'ALL' | 'CITIES' | 'PLACES' | 'HOTELS' | 'RESTAURANTS' | 'GEMS' | 'TAXIS'>('ALL');
   const [loading, setLoading] = useState(false);
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  // Booking Modal
+  const [selectedTaxi, setSelectedTaxi] = useState<any | null>(null);
+  const [bookingModalOpen, setBookingModalOpen] = useState(false);
+
   const [results, setResults] = useState<{
     cities: any[];
     places: any[];
     hotels: any[];
     restaurants: any[];
     hiddenGems: any[];
+    taxis: any[];
   }>({
     cities: [],
     places: [],
     hotels: [],
     restaurants: [],
     hiddenGems: [],
+    taxis: [],
   });
 
-  const performSearch = async (searchTerm: string) => {
-    if (!searchTerm.trim()) return;
+  useEffect(() => {
+    api.getCities().then((res) => {
+      if (res.success && res.data) setCitiesList(res.data);
+    });
+  }, []);
+
+  const performSearch = async (searchTerm: string, cityId?: string) => {
+    if (!searchTerm.trim() && !cityId) return;
     setLoading(true);
     try {
-      const res = await api.search(searchTerm);
+      const res = await api.search(searchTerm, cityId);
       if (res.success && res.data) {
-        setResults(res.data);
+        setResults({
+          cities: res.data.cities || [],
+          places: res.data.places || [],
+          hotels: res.data.hotels || [],
+          restaurants: res.data.restaurants || [],
+          hiddenGems: res.data.hiddenGems || [],
+          taxis: res.data.taxis || [],
+        });
       }
     } catch (err) {
       console.error('Search error:', err);
@@ -41,17 +67,55 @@ export const SearchResultsPage: React.FC = () => {
   };
 
   useEffect(() => {
-    if (initialQuery) {
-      performSearch(initialQuery);
+    if (initialQuery || initialCity) {
+      performSearch(initialQuery, initialCity);
     }
-  }, [initialQuery]);
+  }, [initialQuery, initialCity]);
+
+  // Autocomplete live suggestion fetching
+  useEffect(() => {
+    if (query.trim().length >= 2) {
+      const timer = setTimeout(async () => {
+        try {
+          const res = await api.search(query.trim(), selectedCityId);
+          if (res.success && res.data) {
+            const combined = [
+              ...(res.data.cities || []).slice(0, 2).map((c: any) => ({ name: c.name, type: 'City', link: `/city/${c.slug || c.id}` })),
+              ...(res.data.places || []).slice(0, 3).map((p: any) => ({ name: p.name, type: 'Attraction', link: `/places/${p.slug || p.id}` })),
+              ...(res.data.hotels || []).slice(0, 2).map((h: any) => ({ name: h.name, type: 'Hotel', link: `/hotels/${h.id}` })),
+              ...(res.data.restaurants || []).slice(0, 2).map((r: any) => ({ name: r.name, type: 'Restaurant', link: `/restaurants/${r.id}` })),
+            ];
+            setSuggestions(combined);
+            setShowSuggestions(combined.length > 0);
+          }
+        } catch {
+          // ignore error
+        }
+      }, 250);
+      return () => clearTimeout(timer);
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  }, [query, selectedCityId]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (query.trim()) {
-      setSearchParams({ q: query.trim() });
-      performSearch(query.trim());
-    }
+    setShowSuggestions(false);
+    const params: Record<string, string> = {};
+    if (query.trim()) params.q = query.trim();
+    if (selectedCityId) params.city_id = selectedCityId;
+    setSearchParams(params);
+    performSearch(query.trim(), selectedCityId);
+  };
+
+  const handleCityChange = (cityId: string) => {
+    setSelectedCityId(cityId);
+    const params: Record<string, string> = {};
+    if (query.trim()) params.q = query.trim();
+    if (cityId) params.city_id = cityId;
+    setSearchParams(params);
+    performSearch(query.trim(), cityId);
   };
 
   const totalResults =
@@ -59,7 +123,8 @@ export const SearchResultsPage: React.FC = () => {
     results.places.length +
     results.hotels.length +
     results.restaurants.length +
-    results.hiddenGems.length;
+    results.hiddenGems.length +
+    results.taxis.length;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
@@ -72,20 +137,59 @@ export const SearchResultsPage: React.FC = () => {
             Find destinations, monuments, verified hotels, regional dining spots, and offbeat hidden gems across India.
           </p>
 
-          <form onSubmit={handleSearchSubmit} className="pt-2 flex items-center gap-2">
+          <form onSubmit={handleSearchSubmit} className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 relative">
             <div className="relative flex-1">
               <Search className="w-5 h-5 absolute left-4 top-3.5 text-slate-400" />
               <input
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
+                onFocus={() => { if (suggestions.length > 0) setShowSuggestions(true); }}
                 placeholder="Search Jaipur, Dal Baati, Palace Hotel, Amber..."
                 className="w-full pl-12 pr-4 py-3 rounded-2xl bg-white text-slate-900 placeholder:text-slate-400 text-sm font-medium focus:outline-hidden shadow-md"
               />
+              {/* Autocomplete Suggestions Dropdown */}
+              {showSuggestions && suggestions.length > 0 && (
+                <div className="absolute left-0 right-0 top-full mt-1.5 bg-white text-slate-900 rounded-2xl shadow-xl border border-slate-200 py-2 z-50 overflow-hidden">
+                  <div className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                    Instant Suggestions
+                  </div>
+                  {suggestions.map((item, idx) => (
+                    <Link
+                      key={idx}
+                      to={item.link}
+                      onClick={() => setShowSuggestions(false)}
+                      className="px-4 py-2 hover:bg-emerald-50 flex items-center justify-between text-xs font-semibold text-slate-800 transition"
+                    >
+                      <span>{item.name}</span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 font-bold">
+                        {item.type}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
+
+            {/* Location / City Filter Dropdown */}
+            <div className="w-full sm:w-48">
+              <select
+                value={selectedCityId}
+                onChange={(e) => handleCityChange(e.target.value)}
+                className="w-full px-3 py-3 rounded-2xl bg-white text-slate-900 text-xs font-semibold shadow-md focus:outline-hidden border-0"
+              >
+                <option value="">All Destinations</option>
+                {citiesList.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             <button
               type="submit"
-              className="px-6 py-3 bg-[#F9C74F] hover:bg-amber-400 text-slate-950 font-bold text-sm rounded-2xl shadow-md transition"
+              className="px-6 py-3 bg-[#F9C74F] hover:bg-amber-400 text-slate-950 font-bold text-sm rounded-2xl shadow-md transition shrink-0 cursor-pointer"
             >
               Search
             </button>
@@ -103,6 +207,7 @@ export const SearchResultsPage: React.FC = () => {
             { key: 'HOTELS', label: `Hotels (${results.hotels.length})` },
             { key: 'RESTAURANTS', label: `Restaurants (${results.restaurants.length})` },
             { key: 'GEMS', label: `Hidden Gems (${results.hiddenGems.length})` },
+            { key: 'TAXIS', label: `Taxi Services (${results.taxis.length})` },
           ].map((tab) => (
             <button
               key={tab.key}
@@ -399,8 +504,94 @@ export const SearchResultsPage: React.FC = () => {
               </div>
             </div>
           )}
+
+          {/* TAXI SERVICES */}
+          {(activeFilter === 'ALL' || activeFilter === 'TAXIS') && results.taxis && results.taxis.length > 0 && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-bold text-slate-900 font-heading flex items-center space-x-2">
+                  <Car className="w-4 h-4 text-emerald-600" />
+                  <span>Taxi &amp; Cab Services ({results.taxis.length})</span>
+                </h3>
+                <Link to="/taxis" className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 flex items-center space-x-1">
+                  <span>Browse All Taxis</span>
+                  <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                {results.taxis.map((taxi) => {
+                  const photo = Array.isArray(taxi.vehicle_photos) && taxi.vehicle_photos[0]
+                    ? taxi.vehicle_photos[0]
+                    : 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=800&q=80';
+                  return (
+                    <div
+                      key={taxi.id}
+                      className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-2xs hover:shadow-md transition flex flex-col justify-between"
+                    >
+                      <div className="relative h-44 w-full overflow-hidden">
+                        <SafeImage
+                          src={photo}
+                          alt={taxi.service_name || 'Taxi Service'}
+                          className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                          category="transport"
+                        />
+                        <div className="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-xs text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                          {taxi.vehicle_type || 'Cab'}
+                        </div>
+                        {taxi.rating > 0 && (
+                          <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-xs text-slate-900 text-xs font-bold px-2 py-0.5 rounded-full flex items-center space-x-1 shadow-xs">
+                            <Star className="w-3 h-3 text-amber-500 fill-current" />
+                            <span>{Number(taxi.rating).toFixed(1)}</span>
+                          </div>
+                        )}
+                        <div className="absolute bottom-3 right-3 bg-emerald-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-xs">
+                          ₹{taxi.per_km_rate}/km
+                        </div>
+                      </div>
+                      <div className="p-5 space-y-3">
+                        <div>
+                          <h4 className="font-bold text-base text-slate-900 font-heading">
+                            {taxi.service_name || taxi.driver_name}
+                          </h4>
+                          <p className="text-xs text-slate-500 flex items-center space-x-1 mt-0.5">
+                            <MapPin className="w-3 h-3 text-slate-400" />
+                            <span>{taxi.city_name || 'Local Fleet'}</span>
+                            <span className="text-slate-300">•</span>
+                            <span>{taxi.seating_capacity || 4} Seater</span>
+                          </p>
+                        </div>
+                        <div className="pt-2 flex items-center justify-between border-t border-slate-100">
+                          <span className="text-xs text-slate-500">
+                            Base fare: <strong className="text-slate-800">₹{taxi.base_fare || 150}</strong>
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedTaxi(taxi);
+                              setBookingModalOpen(true);
+                            }}
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition shadow-xs flex items-center space-x-1 cursor-pointer"
+                          >
+                            <Car className="w-3.5 h-3.5" />
+                            <span>Book Ride</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       )}
+
+      {/* Booking Modal */}
+      <TaxiBookingModal
+        taxi={selectedTaxi}
+        isOpen={bookingModalOpen}
+        onClose={() => setBookingModalOpen(false)}
+      />
 
       {/* Footer Skyline */}
       <div className="pt-10">

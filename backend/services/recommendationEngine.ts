@@ -10,7 +10,7 @@ export interface PlanTripInput {
   transportMode: 'Self / Own Vehicle' | 'Own Car' | 'Own Bike' | 'Bus' | 'Train' | 'Flight' | 'Taxi' | 'Local Transport' | string;
   interests: string[];
   travellerType: 'Family' | 'Friends' | 'Solo' | 'Couple';
-  foodPreference?: 'veg' | 'non_veg';
+  foodPreference?: 'veg' | 'non_veg' | 'both';
 }
 
 export interface GeneratedStop {
@@ -93,7 +93,7 @@ export interface GeneratedTripResult {
   transportMode: string;
   travellerType: string;
   interests: string[];
-  foodPreference?: 'veg' | 'non_veg';
+  foodPreference?: 'veg' | 'non_veg' | 'both';
   budget: BudgetBreakdown;
   days: GeneratedDay[];
   routeSummary: {

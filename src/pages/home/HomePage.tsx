@@ -579,7 +579,75 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* 4. CURATED HIDDEN GEMS (USP 1) */}
+      {/* 4. MUST-VISIT TOURIST PLACES & HERITAGE */}
+      {featuredPlaces.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+            <div>
+              <span className="text-xs font-bold uppercase tracking-wider text-[#0F766E]">Iconic Sights &amp; Heritage</span>
+              <h2 className="text-3xl font-bold text-[#0B192C] mt-1 font-heading">Must-Visit Monuments &amp; Attractions</h2>
+              <p className="text-slate-600 text-sm mt-1">Discover world-renowned heritage wonders, royal forts, and spiritual river ghats.</p>
+            </div>
+            <Link to="/explore" className="text-sm font-semibold text-[#0F766E] hover:text-[#0B192C] flex items-center space-x-1">
+              <span>View all attractions</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {featuredPlaces.slice(0, 4).map((place) => (
+              <Link
+                key={place.id}
+                to={`/places/${place.slug || place.id}`}
+                className="group bg-white rounded-3xl overflow-hidden border border-slate-200/80 shadow-xs card-hover flex flex-col justify-between"
+              >
+                <div>
+                  <div className="relative h-48 overflow-hidden">
+                    <SafeImage
+                      src={place.cover_image}
+                      alt={place.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                      category="place"
+                    />
+                    <span className="absolute top-3 left-3 bg-[#0B192C]/80 backdrop-blur-xs text-white text-xs font-semibold px-2.5 py-1 rounded-full">
+                      {place.city_name}
+                    </span>
+                    {place.gallery && place.gallery.length > 1 && (
+                      <span className="absolute top-3 right-3 bg-black/60 backdrop-blur-xs text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center space-x-1">
+                        <span>📸</span>
+                        <span>{place.gallery.length} Photos</span>
+                      </span>
+                    )}
+                    <span className="absolute bottom-3 right-3 bg-white text-[#0B192C] text-xs font-bold px-2.5 py-1 rounded-full shadow-xs">
+                      {place.entry_fee === 0 ? 'Free Entry' : `₹${place.entry_fee}`}
+                    </span>
+                  </div>
+
+                  <div className="p-5 space-y-2">
+                    <span className="text-[10px] font-bold text-[#0F766E] uppercase tracking-wider">{place.category}</span>
+                    <h3 className="font-bold text-base text-[#0B192C] group-hover:text-[#0F766E] transition font-heading">
+                      {place.name}
+                    </h3>
+                    <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">{place.description}</p>
+                  </div>
+                </div>
+
+                <div className="p-5 pt-0">
+                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
+                    <span className="text-[#FF6B35] font-bold flex items-center space-x-1">
+                      <Star className="w-3.5 h-3.5 fill-[#FF6B35] text-[#FF6B35]" />
+                      <span>{place.rating}</span>
+                    </span>
+                    <span>{place.recommended_duration_hours}h duration</span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* 5. CURATED HIDDEN GEMS (USP 1) */}
       <section className="bg-[#FAF9F6] py-16 border-y border-[#2DD4BF]/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
@@ -640,7 +708,132 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* 5. TAXI & LOCAL TRANSPORT (WITH TAXI NEAR ME CTA) */}
+      {/* 6. RECOMMENDED HOTELS & STAYS */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+          <div>
+            <span className="text-xs font-bold uppercase tracking-wider text-[#0F766E]">Stays &amp; Havelis</span>
+            <h2 className="text-3xl font-bold text-[#0B192C] mt-1 font-heading">Recommended Heritage &amp; Luxury Hotels</h2>
+            <p className="text-slate-600 text-sm mt-1">Rest in authentic royal havelis, luxury palaces, and cozy hill cottages.</p>
+          </div>
+          <Link to="/hotels" className="text-sm font-semibold text-[#0F766E] hover:text-[#0B192C] flex items-center space-x-1">
+            <span>View all hotels</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {featuredHotels.slice(0, 3).map((hotel) => (
+            <Link
+              key={hotel.id}
+              to={`/hotels/${hotel.id}`}
+              className="group bg-white rounded-3xl overflow-hidden border border-slate-200/80 shadow-xs card-hover flex flex-col"
+            >
+              <div className="relative h-48 overflow-hidden">
+                <SafeImage
+                  src={hotel.photos?.[0] || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80'}
+                  alt={hotel.name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                  category="hotel"
+                />
+                <span className="absolute top-3 left-3 bg-[#0B192C]/80 backdrop-blur-xs text-white text-xs font-semibold px-2.5 py-1 rounded-full">
+                  {hotel.city_name}
+                </span>
+                {hotel.photos && hotel.photos.length > 1 && (
+                  <span className="absolute top-3 right-3 bg-black/60 backdrop-blur-xs text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center space-x-1">
+                    <span>📸</span>
+                    <span>{hotel.photos.length} Photos</span>
+                  </span>
+                )}
+                <span className="absolute bottom-3 right-3 bg-white text-[#0B192C] text-xs font-bold px-2.5 py-1 rounded-full shadow-xs">
+                  ₹{hotel.price_per_night} / night
+                </span>
+              </div>
+              <div className="p-5 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="font-bold text-base text-[#0B192C] group-hover:text-[#0F766E] transition font-heading">
+                    {hotel.name}
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-1 line-clamp-2">{hotel.description}</p>
+                </div>
+                <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                  <span className="text-[#FF6B35] font-bold flex items-center space-x-1">
+                    <Star className="w-3.5 h-3.5 fill-[#FF6B35] text-[#FF6B35]" />
+                    <span>{hotel.rating}</span>
+                  </span>
+                  <span className="text-slate-400">{hotel.facilities?.slice(0, 2).join(' • ')}</span>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* 7. AUTHENTIC DINING & RESTAURANTS */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+          <div>
+            <span className="text-xs font-bold uppercase tracking-wider text-[#0F766E]">Culinary Journeys</span>
+            <h2 className="text-3xl font-bold text-[#0B192C] mt-1 font-heading">Iconic Flavours &amp; Dining</h2>
+            <p className="text-slate-600 text-sm mt-1">From pure vegetarian thalis and heritage dhabas to Mughlai tandoor and coastal curries.</p>
+          </div>
+          <Link to="/restaurants" className="text-sm font-semibold text-[#0F766E] hover:text-[#0B192C] flex items-center space-x-1">
+            <span>View all restaurants</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {featuredRestaurants.slice(0, 3).map((restaurant) => (
+            <Link
+              key={restaurant.id}
+              to={`/restaurants/${restaurant.id}`}
+              className="group bg-white rounded-3xl overflow-hidden border border-slate-200/80 shadow-xs card-hover flex flex-col"
+            >
+              <div className="relative h-48 overflow-hidden">
+                <SafeImage
+                  src={restaurant.photos?.[0] || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80'}
+                  alt={restaurant.name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                  category="restaurant"
+                />
+                <span className="absolute top-3 left-3 bg-[#0B192C]/80 backdrop-blur-xs text-white text-xs font-semibold px-2.5 py-1 rounded-full">
+                  {restaurant.city_name}
+                </span>
+                {restaurant.photos && restaurant.photos.length > 1 && (
+                  <span className="absolute top-3 right-3 bg-black/60 backdrop-blur-xs text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center space-x-1">
+                    <span>📸</span>
+                    <span>{restaurant.photos.length} Photos</span>
+                  </span>
+                )}
+                <span className="absolute bottom-3 right-3 bg-[#0F766E] text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-xs">
+                  ₹{restaurant.avg_cost_for_two} for two
+                </span>
+              </div>
+              <div className="p-5 flex-1 flex flex-col justify-between">
+                <div>
+                  <span className="text-[11px] font-bold text-[#0F766E]">{restaurant.cuisine}</span>
+                  <h3 className="font-bold text-base text-[#0B192C] group-hover:text-[#0F766E] transition font-heading mt-0.5">
+                    {restaurant.name}
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-1 line-clamp-2">
+                    Famous for: {restaurant.popular_dishes?.join(', ')}
+                  </p>
+                </div>
+                <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                  <span className="text-[#FF6B35] font-bold flex items-center space-x-1">
+                    <Star className="w-3.5 h-3.5 fill-[#FF6B35] text-[#FF6B35]" />
+                    <span>{restaurant.rating}</span>
+                  </span>
+                  <span className="text-[#0F766E] font-semibold">View Menu →</span>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* 8. TAXI & LOCAL TRANSPORT (WITH TAXI NEAR ME CTA) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-[#0B192C] rounded-3xl p-8 lg:p-12 text-white relative overflow-hidden shadow-2xl">
           <div className="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-[#0F766E]/25 blur-3xl pointer-events-none"></div>
@@ -706,198 +899,65 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* 6. RECOMMENDED PLACES, HOTELS & RESTAURANTS */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
-        {/* Recommended Places & Monuments */}
-        {featuredPlaces.length > 0 && (
-          <div>
-            <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
-              <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-[#0F766E]">Iconic Sights &amp; Heritage</span>
-                <h2 className="text-3xl font-bold text-[#0B192C] mt-1 font-heading">Must-Visit Monuments &amp; Attractions</h2>
-                <p className="text-slate-600 text-sm mt-1">Discover world-renowned heritage wonders, royal forts, and spiritual river ghats.</p>
+      {/* 9. WHY TRAVELSAATHI AI */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-gradient-to-br from-[#0B192C] via-[#0F766E] to-[#07101C] rounded-3xl p-8 sm:p-12 text-white shadow-2xl relative overflow-hidden border border-[#2DD4BF]/30">
+          <div className="max-w-2xl mb-10 space-y-2 relative z-10">
+            <span className="text-xs font-bold uppercase tracking-widest text-[#2DD4BF] bg-[#2DD4BF]/15 px-3 py-1 rounded-full border border-[#2DD4BF]/30 inline-block">
+              Why Choose TravelSaathi AI
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold font-heading text-white">
+              Smarter Trips. Authentic India. Zero Backtracking.
+            </h2>
+            <p className="text-[#FAF9F6]/80 text-sm">
+              Discover India without the chaos. Our algorithms balance time, budget, diet, and local transport so you can focus on the wonder.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
+            {/* Value Prop 1 */}
+            <div className="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/15 hover:bg-white/15 transition space-y-3">
+              <div className="w-12 h-12 rounded-xl bg-[#FF6B35] text-white flex items-center justify-center font-bold text-xl shadow-md">
+                <Sparkles className="w-6 h-6 text-white" />
               </div>
-              <Link to="/explore" className="text-sm font-semibold text-[#0F766E] hover:text-[#0B192C] flex items-center space-x-1">
-                <span>View all attractions</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
+              <h3 className="text-lg font-bold font-heading text-white">Intelligent Route Sequencing</h3>
+              <p className="text-xs text-[#FAF9F6]/80 leading-relaxed">
+                No crisscrossing the city. We group sights by geo-proximity, crowd timings, and daylight so you spend time exploring, not stuck in traffic.
+              </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {featuredPlaces.slice(0, 4).map((place) => (
-                <Link
-                  key={place.id}
-                  to={`/places/${place.slug || place.id}`}
-                  className="group bg-white rounded-3xl overflow-hidden border border-slate-200/80 shadow-xs card-hover flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="relative h-48 overflow-hidden">
-                      <SafeImage
-                        src={place.cover_image}
-                        alt={place.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
-                        category="place"
-                      />
-                      <span className="absolute top-3 left-3 bg-[#0B192C]/80 backdrop-blur-xs text-white text-xs font-semibold px-2.5 py-1 rounded-full">
-                        {place.city_name}
-                      </span>
-                      {place.gallery && place.gallery.length > 1 && (
-                        <span className="absolute top-3 right-3 bg-black/60 backdrop-blur-xs text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center space-x-1">
-                          <span>📸</span>
-                          <span>{place.gallery.length} Photos</span>
-                        </span>
-                      )}
-                      <span className="absolute bottom-3 right-3 bg-white text-[#0B192C] text-xs font-bold px-2.5 py-1 rounded-full shadow-xs">
-                        {place.entry_fee === 0 ? 'Free Entry' : `₹${place.entry_fee}`}
-                      </span>
-                    </div>
-
-                    <div className="p-5 space-y-2">
-                      <span className="text-[10px] font-bold text-[#0F766E] uppercase tracking-wider">{place.category}</span>
-                      <h3 className="font-bold text-base text-[#0B192C] group-hover:text-[#0F766E] transition font-heading">
-                        {place.name}
-                      </h3>
-                      <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">{place.description}</p>
-                    </div>
-                  </div>
-
-                  <div className="p-5 pt-0">
-                    <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
-                      <span className="text-[#FF6B35] font-bold flex items-center space-x-1">
-                        <Star className="w-3.5 h-3.5 fill-[#FF6B35] text-[#FF6B35]" />
-                        <span>{place.rating}</span>
-                      </span>
-                      <span>{place.recommended_duration_hours}h duration</span>
-                    </div>
-                  </div>
-                </Link>
-              ))}
+            {/* Value Prop 2 */}
+            <div className="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/15 hover:bg-white/15 transition space-y-3">
+              <div className="w-12 h-12 rounded-xl bg-[#2DD4BF] text-[#0B192C] flex items-center justify-center font-bold text-xl shadow-md">
+                <ShieldCheck className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-bold font-heading text-white">Mathematical Budget Guard</h3>
+              <p className="text-xs text-[#FAF9F6]/80 leading-relaxed">
+                Hotel + Meals + Transport + Entry Fees = Transparent Total. If plans exceed your budget, 1-click &ldquo;Optimize My Trip&rdquo; resets costs safely.
+              </p>
             </div>
-          </div>
-        )}
 
-        {/* Hotels */}
-        <div>
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
-            <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-[#0F766E]">Stays &amp; Havelis</span>
-              <h2 className="text-3xl font-bold text-[#0B192C] mt-1 font-heading">Recommended Heritage &amp; Luxury Hotels</h2>
-              <p className="text-slate-600 text-sm mt-1">Rest in authentic royal havelis, luxury palaces, and cozy hill cottages.</p>
+            {/* Value Prop 3 */}
+            <div className="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/15 hover:bg-white/15 transition space-y-3">
+              <div className="w-12 h-12 rounded-xl bg-[#0F766E] text-[#2DD4BF] flex items-center justify-center font-bold text-xl shadow-md border border-[#2DD4BF]/40">
+                <Utensils className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-bold font-heading text-white">Strict Diet Integrity</h3>
+              <p className="text-xs text-[#FAF9F6]/80 leading-relaxed">
+                Pure Veg filters mean 100% vegetarian dhabas and restaurants. Non-veg and Both options curated cleanly with zero cross-contamination.
+              </p>
             </div>
-            <Link to="/hotels" className="text-sm font-semibold text-[#0F766E] hover:text-[#0B192C] flex items-center space-x-1">
-              <span>View all hotels</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredHotels.slice(0, 3).map((hotel) => (
-              <Link
-                key={hotel.id}
-                to={`/hotels/${hotel.id}`}
-                className="group bg-white rounded-3xl overflow-hidden border border-slate-200/80 shadow-xs card-hover flex flex-col"
-              >
-                <div className="relative h-48 overflow-hidden">
-                  <SafeImage
-                    src={hotel.photos?.[0] || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80'}
-                    alt={hotel.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-                    category="hotel"
-                  />
-                  <span className="absolute top-3 left-3 bg-[#0B192C]/80 backdrop-blur-xs text-white text-xs font-semibold px-2.5 py-1 rounded-full">
-                    {hotel.city_name}
-                  </span>
-                  {hotel.photos && hotel.photos.length > 1 && (
-                    <span className="absolute top-3 right-3 bg-black/60 backdrop-blur-xs text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center space-x-1">
-                      <span>📸</span>
-                      <span>{hotel.photos.length} Photos</span>
-                    </span>
-                  )}
-                  <span className="absolute bottom-3 right-3 bg-white text-[#0B192C] text-xs font-bold px-2.5 py-1 rounded-full shadow-xs">
-                    ₹{hotel.price_per_night} / night
-                  </span>
-                </div>
-                <div className="p-5 flex-1 flex flex-col justify-between">
-                  <div>
-                    <h3 className="font-bold text-base text-[#0B192C] group-hover:text-[#0F766E] transition font-heading">
-                      {hotel.name}
-                    </h3>
-                    <p className="text-xs text-slate-500 mt-1 line-clamp-2">{hotel.description}</p>
-                  </div>
-                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-                    <span className="text-[#FF6B35] font-bold flex items-center space-x-1">
-                      <Star className="w-3.5 h-3.5 fill-[#FF6B35] text-[#FF6B35]" />
-                      <span>{hotel.rating}</span>
-                    </span>
-                    <span className="text-slate-400">{hotel.facilities?.slice(0, 2).join(' • ')}</span>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        {/* Restaurants */}
-        <div>
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
-            <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-[#0F766E]">Culinary Journeys</span>
-              <h2 className="text-3xl font-bold text-[#0B192C] mt-1 font-heading">Iconic Flavours &amp; Dining</h2>
-              <p className="text-slate-600 text-sm mt-1">From Mughlai tandoor and Rajasthani thalis to Goan seafood curries.</p>
+            {/* Value Prop 4 */}
+            <div className="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/15 hover:bg-white/15 transition space-y-3">
+              <div className="w-12 h-12 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-bold text-xl shadow-md">
+                <Car className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-bold font-heading text-white">Verified Fleets &amp; Fair Rates</h3>
+              <p className="text-xs text-[#FAF9F6]/80 leading-relaxed">
+                Zero surprise surge fees. Transparent per-km driver rates, direct local contacts, and instant GPS cab hailing across 16+ cities.
+              </p>
             </div>
-            <Link to="/restaurants" className="text-sm font-semibold text-[#0F766E] hover:text-[#0B192C] flex items-center space-x-1">
-              <span>View all restaurants</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredRestaurants.slice(0, 3).map((restaurant) => (
-              <Link
-                key={restaurant.id}
-                to={`/restaurants/${restaurant.id}`}
-                className="group bg-white rounded-3xl overflow-hidden border border-slate-200/80 shadow-xs card-hover flex flex-col"
-              >
-                <div className="relative h-48 overflow-hidden">
-                  <SafeImage
-                    src={restaurant.photos?.[0] || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80'}
-                    alt={restaurant.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-                    category="restaurant"
-                  />
-                  <span className="absolute top-3 left-3 bg-[#0B192C]/80 backdrop-blur-xs text-white text-xs font-semibold px-2.5 py-1 rounded-full">
-                    {restaurant.city_name}
-                  </span>
-                  {restaurant.photos && restaurant.photos.length > 1 && (
-                    <span className="absolute top-3 right-3 bg-black/60 backdrop-blur-xs text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center space-x-1">
-                      <span>📸</span>
-                      <span>{restaurant.photos.length} Photos</span>
-                    </span>
-                  )}
-                  <span className="absolute bottom-3 right-3 bg-[#0F766E] text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-xs">
-                    ₹{restaurant.avg_cost_for_two} for two
-                  </span>
-                </div>
-                <div className="p-5 flex-1 flex flex-col justify-between">
-                  <div>
-                    <span className="text-[11px] font-bold text-[#0F766E]">{restaurant.cuisine}</span>
-                    <h3 className="font-bold text-base text-[#0B192C] group-hover:text-[#0F766E] transition font-heading mt-0.5">
-                      {restaurant.name}
-                    </h3>
-                    <p className="text-xs text-slate-500 mt-1 line-clamp-2">
-                      Famous for: {restaurant.popular_dishes?.join(', ')}
-                    </p>
-                  </div>
-                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-                    <span className="text-[#FF6B35] font-bold flex items-center space-x-1">
-                      <Star className="w-3.5 h-3.5 fill-[#FF6B35] text-[#FF6B35]" />
-                      <span>{restaurant.rating}</span>
-                    </span>
-                    <span className="text-[#0F766E] font-semibold">View Menu →</span>
-                  </div>
-                </div>
-              </Link>
-            ))}
           </div>
         </div>
       </section>

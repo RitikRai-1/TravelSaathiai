@@ -25,6 +25,7 @@ import {
   Settings as SettingsIcon,
   Sun,
   Moon,
+  Search,
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
@@ -123,6 +124,16 @@ export const Navbar: React.FC = () => {
 
             {/* Language Selector */}
             <LanguageSelector />
+
+            {/* Omni Search Shortcut */}
+            <Link
+              to="/search"
+              title="Omni Search India"
+              className="p-1.5 text-slate-300 hover:text-[#2DD4BF] hover:bg-[#1E3E62]/50 rounded-xl transition flex-shrink-0"
+              aria-label="Omni Search India"
+            >
+              <Search className="w-4 h-4" />
+            </Link>
 
             {/* Quick Settings Shortcut */}
             <Link
@@ -326,6 +337,16 @@ export const Navbar: React.FC = () => {
             <span className="text-xs font-semibold text-slate-300">Language</span>
             <LanguageSelector />
           </div>
+
+          {/* Quick Omni Search on Mobile */}
+          <Link
+            to="/search"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center space-x-2.5 px-3.5 py-2.5 rounded-xl bg-[#07101C] border border-[#0F766E]/40 text-xs font-semibold text-slate-200 hover:text-[#2DD4BF] transition"
+          >
+            <Search className="w-4 h-4 text-[#2DD4BF]" />
+            <span>Search destinations, stays, food, taxis...</span>
+          </Link>
 
           {/* Nav Links */}
           <div className="space-y-1">

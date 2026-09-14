@@ -93,42 +93,78 @@ router.get('/places', tourismCtrl.getPlaces);
 router.get('/places/:id', tourismCtrl.getPlaceById);
 router.get('/hidden-gems', tourismCtrl.getHiddenGems);
 
-// Global Search
+// Global Search (Cities, Places, Hotels, Restaurants, Hidden Gems, Taxis)
 router.get('/search', async (req: Request, res: Response) => {
   try {
     const q = String(req.query.q || '').trim();
-    if (!q) {
-      return res.json({ success: true, data: { cities: [], places: [], hotels: [], restaurants: [], hiddenGems: [] } });
+    const cityId = req.query.city_id ? Number(req.query.city_id) : null;
+    if (!q && !cityId) {
+      return res.json({ success: true, data: { cities: [], places: [], hotels: [], restaurants: [], hiddenGems: [], taxis: [] } });
     }
-    const like = `%${q}%`;
-    const cities = dbManager.query(
-      'SELECT * FROM cities WHERE is_published = 1 AND (name LIKE ? OR description LIKE ?) LIMIT 10',
-      [like, like]
-    ).map(c => ({ ...c, categories: JSON.parse(c.categories_json || '[]') }));
+    const like = q ? `%${q}%` : '%';
 
-    const places = dbManager.query(
-      'SELECT p.*, c.name as city_name FROM tourist_places p JOIN cities c ON c.id = p.city_id WHERE p.is_published = 1 AND (p.name LIKE ? OR p.description LIKE ? OR p.category LIKE ?) LIMIT 10',
-      [like, like, like]
-    ).map(p => ({ ...p, gallery: JSON.parse(p.gallery_json || '[]') }));
+    // 1. Cities
+    let cities: any[] = [];
+    if (q) {
+      cities = dbManager.query(
+        'SELECT * FROM cities WHERE is_published = 1 AND (name LIKE ? OR description LIKE ?) LIMIT 10',
+        [like, like]
+      ).map(c => ({ ...c, categories: JSON.parse(c.categories_json || '[]') }));
+    }
 
-    const hotels = dbManager.query(
-      'SELECT h.*, c.name as city_name FROM hotels h JOIN cities c ON c.id = h.city_id WHERE h.is_published = 1 AND (h.name LIKE ? OR h.description LIKE ? OR h.address LIKE ?) LIMIT 10',
-      [like, like, like]
-    ).map(h => ({ ...h, photos: JSON.parse(h.photos_json || '[]'), facilities: JSON.parse(h.facilities_json || '[]') }));
+    // 2. Places
+    let placeSql = 'SELECT p.*, c.name as city_name FROM tourist_places p JOIN cities c ON c.id = p.city_id WHERE p.is_published = 1 AND (p.name LIKE ? OR p.description LIKE ? OR p.category LIKE ? OR c.name LIKE ?)';
+    const placeParams: any[] = [like, like, like, like];
+    if (cityId) {
+      placeSql += ' AND p.city_id = ?';
+      placeParams.push(cityId);
+    }
+    placeSql += ' LIMIT 10';
+    const places = dbManager.query(placeSql, placeParams).map(p => ({ ...p, gallery: JSON.parse(p.gallery_json || '[]') }));
 
-    const restaurants = dbManager.query(
-      'SELECT r.*, c.name as city_name FROM restaurants r JOIN cities c ON c.id = r.city_id WHERE r.is_published = 1 AND (r.name LIKE ? OR r.description LIKE ? OR r.cuisine LIKE ?) LIMIT 10',
-      [like, like, like]
-    ).map(r => ({ ...r, photos: JSON.parse(r.photos_json || '[]'), popular_dishes: JSON.parse(r.popular_dishes_json || '[]') }));
+    // 3. Hotels
+    let hotelSql = 'SELECT h.*, c.name as city_name FROM hotels h JOIN cities c ON c.id = h.city_id WHERE h.is_published = 1 AND h.approval_status = "APPROVED" AND (h.name LIKE ? OR h.description LIKE ? OR h.address LIKE ? OR c.name LIKE ?)';
+    const hotelParams: any[] = [like, like, like, like];
+    if (cityId) {
+      hotelSql += ' AND h.city_id = ?';
+      hotelParams.push(cityId);
+    }
+    hotelSql += ' LIMIT 10';
+    const hotels = dbManager.query(hotelSql, hotelParams).map(h => ({ ...h, photos: JSON.parse(h.photos_json || '[]'), facilities: JSON.parse(h.facilities_json || '[]') }));
 
-    const hiddenGems = dbManager.query(
-      'SELECT g.*, c.name as city_name FROM hidden_gems g JOIN cities c ON c.id = g.city_id WHERE g.is_published = 1 AND (g.name LIKE ? OR g.description LIKE ?) LIMIT 10',
-      [like, like]
-    ).map(g => ({ ...g, photos: JSON.parse(g.photos_json || '[]') }));
+    // 4. Restaurants
+    let restSql = 'SELECT r.*, c.name as city_name FROM restaurants r JOIN cities c ON c.id = r.city_id WHERE r.is_published = 1 AND r.approval_status = "APPROVED" AND (r.name LIKE ? OR r.description LIKE ? OR r.cuisine LIKE ? OR c.name LIKE ?)';
+    const restParams: any[] = [like, like, like, like];
+    if (cityId) {
+      restSql += ' AND r.city_id = ?';
+      restParams.push(cityId);
+    }
+    restSql += ' LIMIT 10';
+    const restaurants = dbManager.query(restSql, restParams).map(r => ({ ...r, photos: JSON.parse(r.photos_json || '[]'), popular_dishes: JSON.parse(r.popular_dishes_json || '[]') }));
+
+    // 5. Hidden Gems
+    let gemSql = 'SELECT g.*, c.name as city_name FROM hidden_gems g JOIN cities c ON c.id = g.city_id WHERE g.is_published = 1 AND (g.name LIKE ? OR g.description LIKE ? OR c.name LIKE ?)';
+    const gemParams: any[] = [like, like, like];
+    if (cityId) {
+      gemSql += ' AND g.city_id = ?';
+      gemParams.push(cityId);
+    }
+    gemSql += ' LIMIT 10';
+    const hiddenGems = dbManager.query(gemSql, gemParams).map(g => ({ ...g, photos: JSON.parse(g.photos_json || '[]') }));
+
+    // 6. Taxis
+    let taxiSql = 'SELECT t.*, c.name as city_name FROM taxi_services t JOIN cities c ON c.id = t.city_id WHERE t.is_published = 1 AND t.approval_status = "APPROVED" AND (t.service_name LIKE ? OR t.driver_name LIKE ? OR t.vehicle_type LIKE ? OR c.name LIKE ?)';
+    const taxiParams: any[] = [like, like, like, like];
+    if (cityId) {
+      taxiSql += ' AND t.city_id = ?';
+      taxiParams.push(cityId);
+    }
+    taxiSql += ' LIMIT 10';
+    const taxis = dbManager.query(taxiSql, taxiParams).map(t => ({ ...t, vehicle_photos: JSON.parse(t.vehicle_photos_json || '[]') }));
 
     res.json({
       success: true,
-      data: { cities, places, hotels, restaurants, hiddenGems },
+      data: { cities, places, hotels, restaurants, hiddenGems, taxis },
     });
   } catch (err: any) {
     res.status(500).json({ success: false, message: err.message || 'Search error' });
@@ -194,63 +230,6 @@ router.post('/business/register', authMiddleware, bizCtrl.registerBusiness);
 router.get('/business/dashboard', authMiddleware, bizCtrl.getBusinessDashboard);
 router.put('/business/:type/:id', authMiddleware, bizCtrl.updateBusinessProfile);
 
-// ==================== GLOBAL SEARCH ====================
-router.get('/search', async (req: Request, res: Response) => {
-  try {
-    const q = (req.query.q as string || '').trim();
-    if (!q) {
-      res.json({ success: true, data: { cities: [], places: [], hotels: [], restaurants: [], hiddenGems: [] } });
-      return;
-    }
-
-    const searchTerm = `%${q}%`;
-    const cities = dbManager.query(
-      'SELECT * FROM cities WHERE is_published = 1 AND (name LIKE ? OR description LIKE ?) LIMIT 6',
-      [searchTerm, searchTerm]
-    );
-
-    const places = dbManager.query(
-      `SELECT p.*, c.name as city_name FROM tourist_places p
-       JOIN cities c ON c.id = p.city_id
-       WHERE p.is_published = 1 AND (p.name LIKE ? OR p.category LIKE ? OR p.description LIKE ?) LIMIT 6`,
-      [searchTerm, searchTerm, searchTerm]
-    );
-
-    const hotels = dbManager.query(
-      `SELECT h.*, c.name as city_name FROM hotels h
-       JOIN cities c ON c.id = h.city_id
-       WHERE h.approval_status = "APPROVED" AND h.is_published = 1 AND (h.name LIKE ? OR h.description LIKE ? OR c.name LIKE ?) LIMIT 6`,
-      [searchTerm, searchTerm, searchTerm]
-    );
-
-    const restaurants = dbManager.query(
-      `SELECT r.*, c.name as city_name FROM restaurants r
-       JOIN cities c ON c.id = r.city_id
-       WHERE r.approval_status = "APPROVED" AND r.is_published = 1 AND (r.name LIKE ? OR r.cuisine LIKE ? OR c.name LIKE ?) LIMIT 6`,
-      [searchTerm, searchTerm, searchTerm]
-    );
-
-    const hiddenGems = dbManager.query(
-      `SELECT g.*, c.name as city_name FROM hidden_gems g
-       JOIN cities c ON c.id = g.city_id
-       WHERE g.is_published = 1 AND (g.name LIKE ? OR g.description LIKE ? OR c.name LIKE ?) LIMIT 6`,
-      [searchTerm, searchTerm, searchTerm]
-    );
-
-    res.json({
-      success: true,
-      data: {
-        cities,
-        places,
-        hotels,
-        restaurants,
-        hiddenGems,
-      },
-    });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Search failed' });
-  }
-});
 
 // ==================== AI ASSISTANT CHAT ====================
 router.post('/ai/chat', async (req: Request, res: Response) => {

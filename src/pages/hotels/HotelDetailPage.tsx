@@ -561,29 +561,86 @@ export const HotelDetailPage: React.FC = () => {
             </button>
 
             {bookingSuccess ? (
-              <div className="text-center py-8 space-y-3">
+              <div className="text-center py-8 space-y-4">
                 <div className="w-14 h-14 rounded-full bg-emerald-100 text-[#1B5E20] flex items-center justify-center mx-auto">
                   <CheckCircle2 className="w-8 h-8" />
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 font-heading">Reservation Inquiry Sent!</h3>
+                <h3 className="text-2xl font-bold text-slate-900 font-heading">Reservation Inquiry Ready!</h3>
                 <p className="text-xs text-slate-600 max-w-sm mx-auto leading-relaxed">
-                  Thank you! The hotel front desk has received your stay request. A confirmation SMS/email will be dispatched shortly.
+                  Your inquiry details for <strong>{hotel.name}</strong> have been prepared. Connect directly with the front desk via phone or email for instantaneous rate confirmation and room lock.
                 </p>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-2 pt-2">
+                  {hotel.phone && (
+                    <a
+                      href={`tel:${hotel.phone}`}
+                      className="w-full sm:w-auto px-5 py-2.5 bg-[#1B5E20] hover:bg-[#154a19] text-white rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1.5"
+                    >
+                      <Phone className="w-3.5 h-3.5" />
+                      <span>Call Front Desk ({hotel.phone})</span>
+                    </a>
+                  )}
+                  {hotel.email && (
+                    <a
+                      href={`mailto:${hotel.email}?subject=Reservation Inquiry: ${hotel.name}&body=Hello, I would like to inquire about booking a ${selectedRoom ? selectedRoom.room_type : 'room'} at ${hotel.name}.`}
+                      className="w-full sm:w-auto px-5 py-2.5 border border-slate-300 hover:border-[#1B5E20] text-slate-700 hover:text-[#1B5E20] rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1.5"
+                    >
+                      <Mail className="w-3.5 h-3.5" />
+                      <span>Email Front Desk</span>
+                    </a>
+                  )}
+                </div>
                 <button
+                  type="button"
                   onClick={() => setBookingModalOpen(false)}
-                  className="mt-4 px-6 py-2.5 bg-[#1B5E20] text-white rounded-xl text-xs font-bold"
+                  className="mt-4 px-6 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold cursor-pointer"
                 >
-                  Done
+                  Close
                 </button>
               </div>
             ) : (
               <>
                 <div className="space-y-1">
-                  <span className="text-[11px] font-bold text-[#1B5E20] uppercase tracking-wider">Stay Reservation</span>
-                  <h3 className="text-2xl font-bold text-slate-900 font-heading">Book at {hotel.name}</h3>
+                  <span className="text-[11px] font-bold text-[#1B5E20] uppercase tracking-wider">Direct Stay Inquiry</span>
+                  <h3 className="text-2xl font-bold text-slate-900 font-heading">Inquire at {hotel.name}</h3>
                   <p className="text-xs text-slate-500">
                     Selected: <strong>{selectedRoom ? selectedRoom.room_type : 'Standard Room'}</strong> (₹{selectedRoom ? selectedRoom.price_per_night : hotel.price_per_night}/night)
                   </p>
+                </div>
+
+                {/* Direct Contact Channels Card */}
+                <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-2">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Verified Contact Details</span>
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    {hotel.phone && (
+                      <a
+                        href={`tel:${hotel.phone}`}
+                        className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-bold text-emerald-800 hover:border-emerald-500"
+                      >
+                        <Phone className="w-3.5 h-3.5 text-[#1B5E20]" />
+                        <span>{hotel.phone}</span>
+                      </a>
+                    )}
+                    {hotel.email && (
+                      <a
+                        href={`mailto:${hotel.email}`}
+                        className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:border-emerald-500"
+                      >
+                        <Mail className="w-3.5 h-3.5 text-[#1B5E20]" />
+                        <span>{hotel.email}</span>
+                      </a>
+                    )}
+                    {hotel.website && (
+                      <a
+                        href={hotel.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:border-emerald-500"
+                      >
+                        <Globe className="w-3.5 h-3.5 text-[#1B5E20]" />
+                        <span>Official Website</span>
+                      </a>
+                    )}
+                  </div>
                 </div>
 
                 <form
@@ -639,7 +696,7 @@ export const HotelDetailPage: React.FC = () => {
                   <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-100 flex items-center justify-between">
                     <div>
                       <span className="text-[11px] text-emerald-900 block font-bold">Estimated Total (2 Nights)</span>
-                      <span className="text-[10px] text-emerald-700">Taxes included • Pay at Hotel</span>
+                      <span className="text-[10px] text-emerald-700">Pay directly to Hotel • 0% Middleman Cut</span>
                     </div>
                     <span className="text-lg font-bold text-[#1B5E20] font-heading">
                       ₹{((selectedRoom ? selectedRoom.price_per_night : hotel.price_per_night) * 2).toLocaleString('en-IN')}
@@ -648,9 +705,9 @@ export const HotelDetailPage: React.FC = () => {
 
                   <button
                     type="submit"
-                    className="w-full py-3 bg-[#1B5E20] hover:bg-[#154a19] text-white font-bold rounded-xl text-sm transition shadow-md shadow-green-900/20"
+                    className="w-full py-3 bg-[#1B5E20] hover:bg-[#154a19] text-white font-bold rounded-xl text-sm transition shadow-md shadow-green-900/20 cursor-pointer"
                   >
-                    Confirm Booking Request
+                    Submit Direct Reservation Inquiry
                   </button>
                 </form>
               </>

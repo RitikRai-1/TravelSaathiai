@@ -296,7 +296,7 @@ export interface GeneratedTrip {
   transportMode: string;
   travellerType: string;
   interests: string[];
-  foodPreference?: 'veg' | 'non_veg';
+  foodPreference?: 'veg' | 'non_veg' | 'both';
   budget: BudgetBreakdown;
   days: GeneratedDay[];
   routeSummary: {

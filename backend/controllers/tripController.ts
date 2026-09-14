@@ -33,7 +33,7 @@ export const generateTrip = async (req: Request, res: Response): Promise<void> =
       transportMode,
       interests: Array.isArray(interests) ? interests : [interests],
       travellerType,
-      foodPreference: foodPreference === 'veg' || foodPreference === 'non_veg' ? foodPreference : undefined,
+      foodPreference: foodPreference === 'veg' || foodPreference === 'non_veg' || foodPreference === 'both' ? foodPreference : undefined,
     };
 
     const trip = RecommendationEngine.generateTrip(input, false);
@@ -76,7 +76,7 @@ export const optimizeTrip = async (req: Request, res: Response): Promise<void> =
       transportMode: transportMode || 'Taxi',
       interests: Array.isArray(interests) ? interests : [interests || 'Heritage'],
       travellerType: travellerType || 'Couple',
-      foodPreference: foodPreference === 'veg' || foodPreference === 'non_veg' ? foodPreference : undefined,
+      foodPreference: foodPreference === 'veg' || foodPreference === 'non_veg' || foodPreference === 'both' ? foodPreference : undefined,
     };
 
     const trip = RecommendationEngine.generateTrip(input, true);

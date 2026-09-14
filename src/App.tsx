@@ -45,11 +45,53 @@ import { AdminCmsPage } from './pages/admin/AdminCmsPage';
 import { AdminFeaturesPage } from './pages/admin/AdminFeaturesPage';
 import { AdminLogsPage } from './pages/admin/AdminLogsPage';
 
-// Scroll to top on route navigation
+// Scroll to top and dynamic page title on route navigation
 const ScrollToTop: React.FC = () => {
   const { pathname } = useLocation();
   useEffect(() => {
     window.scrollTo(0, 0);
+
+    let title = 'TravelSaathi AI — Discover India. Plan Smarter. Travel Better.';
+    if (pathname === '/plan-trip' || pathname === '/trip-planner' || pathname === '/planner') {
+      title = 'AI Trip Planner & Itinerary Generator | TravelSaathi AI';
+    } else if (pathname.startsWith('/trip/')) {
+      title = 'Custom Day-by-Day Itinerary | TravelSaathi AI';
+    } else if (pathname === '/explore') {
+      title = 'Explore 40+ Destinations in India | TravelSaathi AI';
+    } else if (pathname.startsWith('/city/') || pathname.startsWith('/cities/')) {
+      title = 'City Tourism Guide | TravelSaathi AI';
+    } else if (pathname.startsWith('/places/') || pathname.startsWith('/place/')) {
+      title = 'Attraction & Monument Details | TravelSaathi AI';
+    } else if (pathname === '/hotels') {
+      title = 'Verified Heritage Havelis & Hotels | TravelSaathi AI';
+    } else if (pathname.startsWith('/hotels/') || pathname.startsWith('/hotel/')) {
+      title = 'Hotel Reservation & Amenities | TravelSaathi AI';
+    } else if (pathname === '/restaurants') {
+      title = 'Pure Veg & Regional Food Trails | TravelSaathi AI';
+    } else if (pathname.startsWith('/restaurants/') || pathname.startsWith('/restaurant/')) {
+      title = 'Restaurant Menu & Dining Details | TravelSaathi AI';
+    } else if (pathname === '/taxis' || pathname === '/taxis/near-me' || pathname === '/taxi-near-me') {
+      title = 'Verified Local Cabs & GPS Near Me | TravelSaathi AI';
+    } else if (pathname === '/hidden-gems') {
+      title = 'Secret & Offbeat Hidden Gems of India | TravelSaathi AI';
+    } else if (pathname === '/search') {
+      title = 'Omni Search Destinations & Stays | TravelSaathi AI';
+    } else if (pathname === '/dashboard' || pathname === '/my-trips') {
+      title = 'My Travel Portfolio & Saved Itineraries | TravelSaathi AI';
+    } else if (pathname === '/saved') {
+      title = 'My Saved Places & Hotels | TravelSaathi AI';
+    } else if (pathname === '/settings') {
+      title = 'Preferences & Regional Settings | TravelSaathi AI';
+    } else if (pathname.startsWith('/business/')) {
+      title = 'TravelSaathi Business Partner Portal';
+    } else if (pathname.startsWith('/admin')) {
+      title = 'Super Admin Control Center | TravelSaathi AI';
+    } else if (pathname === '/login') {
+      title = 'Sign In | TravelSaathi AI';
+    } else if (pathname === '/signup') {
+      title = 'Create Your TravelSaathi Account';
+    }
+    document.title = title;
   }, [pathname]);
   return null;
 };
@@ -134,6 +176,7 @@ export const App: React.FC = () => {
           {/* AI Trip Planner & Itinerary */}
           <Route path="/plan-trip" element={<TripPlannerPage />} />
           <Route path="/trip-planner" element={<TripPlannerPage />} />
+          <Route path="/planner" element={<TripPlannerPage />} />
           <Route path="/trip/preview" element={<TripDetailPage />} />
           <Route path="/trip/:id" element={<TripDetailPage />} />
           <Route path="/trips/:id" element={<TripDetailPage />} />
