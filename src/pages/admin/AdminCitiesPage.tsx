@@ -208,8 +208,98 @@ export const AdminCitiesPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Cities Table */}
-      <div className="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden">
+      {/* Mobile Cities Cards (<= 767px) */}
+      <div className="block md:hidden space-y-3">
+        {filteredCities.map((city) => (
+          <div key={city.id} className="bg-slate-900 rounded-2xl border border-slate-800 p-4 space-y-3">
+            <div className="flex items-start gap-3">
+              <SafeImage
+                src={city.cover_image}
+                alt={city.name}
+                className="w-14 h-14 rounded-xl object-cover bg-slate-800 flex-shrink-0"
+                category="city"
+              />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-bold text-white text-base truncate">{city.name}</h3>
+                  <span className="px-2 py-0.5 rounded bg-slate-800 text-amber-400 font-mono font-bold text-[10px]">
+                    {city.place_count || 0} spots
+                  </span>
+                </div>
+                <p className="text-xs text-slate-400">{city.state_name}</p>
+                <p className="text-[11px] text-slate-500 line-clamp-2 mt-1">{city.description}</p>
+              </div>
+            </div>
+
+            {/* Badges row */}
+            <div className="flex items-center justify-between pt-2 border-t border-slate-800/80">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleToggleFeature(city)}
+                  className={`inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-[10px] font-bold transition min-h-[32px] ${
+                    city.is_featured
+                      ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                      : 'bg-slate-800 text-slate-500'
+                  }`}
+                >
+                  <Star className={`w-3 h-3 ${city.is_featured ? 'fill-amber-400' : ''}`} />
+                  <span>{city.is_featured ? 'Featured' : 'Standard'}</span>
+                </button>
+
+                <button
+                  onClick={() => handleTogglePublish(city)}
+                  className={`inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-[10px] font-bold transition min-h-[32px] ${
+                    city.is_published
+                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                      : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+                  }`}
+                >
+                  {city.is_published ? (
+                    <>
+                      <CheckCircle className="w-3 h-3" />
+                      <span>Live</span>
+                    </>
+                  ) : (
+                    <>
+                      <XCircle className="w-3 h-3" />
+                      <span>Draft</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* Action icons */}
+              <div className="flex items-center gap-1">
+                <Link
+                  to={`/city/${city.id}`}
+                  target="_blank"
+                  className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition min-h-[44px] min-w-[44px] flex items-center justify-center"
+                  title="View Public City Page"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                </Link>
+                <button
+                  onClick={() => openEditModal(city)}
+                  className="p-2 text-slate-400 hover:text-amber-400 rounded-lg hover:bg-slate-800 transition min-h-[44px] min-w-[44px] flex items-center justify-center"
+                  title="Edit City"
+                >
+                  <Edit2 className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => handleDelete(city.id, city.name)}
+                  className="p-2 text-slate-400 hover:text-rose-400 rounded-lg hover:bg-slate-800 transition min-h-[44px] min-w-[44px] flex items-center justify-center"
+                  title="Delete City"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop Cities Table (>= 768px) - 100% Preserved */}
+      <div className="hidden md:block bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs text-slate-300">
             <thead className="bg-slate-950/80 text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-800">

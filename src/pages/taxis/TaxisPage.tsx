@@ -50,13 +50,13 @@ export const TaxisPage: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-[#1B5E20] via-[#2E7D32] to-[#154a19] rounded-3xl p-8 sm:p-10 text-white shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="bg-gradient-to-r from-[#1B5E20] via-[#2E7D32] to-[#154a19] rounded-3xl p-5 sm:p-8 md:p-10 text-white shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
         <div>
           <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/10 text-xs font-semibold mb-3 border border-white/15">
             <Car className="w-3.5 h-3.5 text-[#F9C74F]" />
             <span>Local Transport Network</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-bold font-heading">Book Verified Local Taxis &amp; Autos</h1>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold font-heading">Book Verified Local Taxis &amp; Autos</h1>
           <p className="text-slate-300 text-sm mt-1.5 max-w-xl">
             Airport transfers, full-day sightseeing, and outstation trips with zero middleman commissions and fair transparent rates.
           </p>
@@ -188,7 +188,7 @@ export const TaxisPage: React.FC = () => {
               <div className="pt-2">
                 <button
                   onClick={() => handleBookTaxi(taxi)}
-                  className="w-full py-3 bg-[#1B5E20] hover:bg-[#154a19] text-white rounded-xl text-xs font-bold shadow-md shadow-green-900/20 transition flex items-center justify-center space-x-1.5 cursor-pointer"
+                  className="w-full py-3 bg-[#1B5E20] hover:bg-[#154a19] text-white rounded-xl text-xs font-bold shadow-md shadow-green-900/20 transition flex items-center justify-center space-x-1.5 cursor-pointer min-h-[44px]"
                 >
                   <Car className="w-4 h-4" />
                   <span>Book This Taxi</span>

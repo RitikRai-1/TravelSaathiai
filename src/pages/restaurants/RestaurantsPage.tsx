@@ -42,13 +42,13 @@ export const RestaurantsPage: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Banner */}
-      <div className="bg-gradient-to-r from-[#1B5E20] via-[#2E7D32] to-[#154a19] rounded-3xl p-8 sm:p-10 text-white shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="bg-gradient-to-r from-[#1B5E20] via-[#2E7D32] to-[#154a19] rounded-3xl p-5 sm:p-8 md:p-10 text-white shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
         <div>
           <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/20 text-xs font-semibold mb-3">
             <Utensils className="w-3.5 h-3.5" />
             <span>Culinary Heritage</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-bold font-heading">Iconic Restaurants & Food Bazaars</h1>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold font-heading">Iconic Restaurants & Food Bazaars</h1>
           <p className="text-emerald-100 text-sm mt-1.5 max-w-xl">
             Savour authentic culinary flavours across India: Old Delhi biryanis, Mumbai Irani cafes, Jaipur thalis, and riverfront hill bistros.
           </p>
@@ -69,7 +69,7 @@ export const RestaurantsPage: React.FC = () => {
           <span className="text-xs font-bold text-slate-500 uppercase tracking-wider mr-1">Diet:</span>
           <button
             onClick={() => setSelectedDiet('all')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition ${
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition min-h-[44px] ${
               selectedDiet === 'all'
                 ? 'bg-[#1B5E20] text-white shadow-xs'
                 : 'bg-white border border-slate-200 text-slate-700 hover:bg-emerald-50'

@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import { Routes, Route, useLocation, Outlet, Link } from 'react-router-dom';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
+import { MobileBottomBar } from './components/layout/MobileBottomBar';
+
 
 // Public & Tourist Pages
 import { HomePage } from './pages/home/HomePage';
@@ -106,14 +108,16 @@ const MainLayout: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col bg-[#FAF9F6] dark:bg-[#07101C] text-slate-900 dark:text-slate-100 selection:bg-[#0F766E] selection:text-white relative transition-colors duration-200">
       <Navbar />
-      <main className="flex-grow">
+      <main className="flex-grow pb-16 md:pb-0">
         <Outlet />
       </main>
       <Footer />
+      <MobileBottomBar />
       <AiAssistantWidget />
     </div>
   );
 };
+
 
 // 404 Fallback
 const NotFoundPage: React.FC = () => {

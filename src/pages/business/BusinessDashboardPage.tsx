@@ -532,18 +532,18 @@ export const BusinessDashboardPage: React.FC = () => {
                     </div>
 
                     {booking.booking_status === 'REQUESTED' || booking.booking_status === 'PENDING' ? (
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-2 w-full sm:w-auto">
                         <button
                           onClick={() => handleUpdateStatus(booking.id, 'CONFIRMED')}
                           disabled={actionLoading === booking.id}
-                          className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition"
+                          className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition min-h-[44px] flex items-center justify-center"
                         >
                           Accept Ride
                         </button>
                         <button
                           onClick={() => handleUpdateStatus(booking.id, 'CANCELLED')}
                           disabled={actionLoading === booking.id}
-                          className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-rose-100 text-slate-700 hover:text-rose-700 text-xs font-semibold transition"
+                          className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-rose-100 text-slate-700 hover:text-rose-700 text-xs font-semibold transition min-h-[44px] flex items-center justify-center"
                         >
                           Decline
                         </button>
@@ -552,7 +552,7 @@ export const BusinessDashboardPage: React.FC = () => {
                       <button
                         onClick={() => handleUpdateStatus(booking.id, 'COMPLETED')}
                         disabled={actionLoading === booking.id}
-                        className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition"
+                        className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition min-h-[44px] flex items-center justify-center"
                       >
                         Mark Completed
                       </button>

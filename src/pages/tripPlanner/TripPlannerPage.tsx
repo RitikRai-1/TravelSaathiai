@@ -5,7 +5,9 @@ import { City } from '../../types';
 import { useLanguage } from '../../context/LanguageContext';
 import { IndianMonumentsSkyline } from '../../components/common/IndianMonumentsSkyline';
 import { PreTripBudgetChart } from '../../components/budget/PreTripBudgetChart';
+import { MobileTripPlannerWizard } from './MobileTripPlannerWizard';
 import { SafeImage } from '../../components/common/SafeImage';
+
 import {
   Sparkles,
   MapPin,
@@ -180,8 +182,43 @@ export const TripPlannerPage: React.FC = () => {
   const selectedCityObj = cities.find((c) => c.id === selectedCityId);
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
-      {/* Planner Card */}
+    <>
+      {/* Dedicated Smartphone Mobile Wizard (<= 767px) */}
+      <div className="block md:hidden">
+        <MobileTripPlannerWizard
+          cities={cities}
+          selectedCityId={selectedCityId}
+          setSelectedCityId={setSelectedCityId}
+          citySearch={citySearch}
+          setCitySearch={setCitySearch}
+          budgetTarget={budgetTarget}
+          setBudgetTarget={setBudgetTarget}
+          customBudget={customBudget}
+          setCustomBudget={setCustomBudget}
+          daysCount={daysCount}
+          setDaysCount={setDaysCount}
+          adultsCount={adultsCount}
+          setAdultsCount={setAdultsCount}
+          childrenCount={childrenCount}
+          setChildrenCount={setChildrenCount}
+          transportMode={transportMode}
+          setTransportMode={setTransportMode}
+          selectedInterests={selectedInterests}
+          toggleInterest={toggleInterest}
+          travellerType={travellerType}
+          setTravellerType={setTravellerType}
+          foodPreference={foodPreference}
+          setFoodPreference={setFoodPreference}
+          isGenerating={isGenerating}
+          genPhase={genPhase}
+          onGenerate={handleGenerate}
+        />
+      </div>
+
+      {/* Existing Desktop & Tablet Form (>= 768px) - 100% untouched */}
+      <div className="hidden md:block max-w-4xl mx-auto px-4 sm:px-6 py-8">
+        {/* Planner Card */}
+
       <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xl overflow-hidden">
         {/* Wizard Header */}
         <div className="bg-gradient-to-r from-[#0B192C] via-[#0F766E] to-[#0B192C] p-6 sm:p-8 text-white relative">
@@ -765,5 +802,7 @@ export const TripPlannerPage: React.FC = () => {
         <IndianMonumentsSkyline className="w-full text-[#0F766E]/20" tagline="Bharat Ki Khoj Ab Aur Aasaan • Designed for India" />
       </div>
     </div>
+    </>
   );
 };
+

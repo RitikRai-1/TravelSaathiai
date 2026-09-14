@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink, Outlet, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import {
@@ -16,12 +16,15 @@ import {
   LogOut,
   AlertCircle,
   Users,
-  Eye
+  Eye,
+  Menu,
+  X,
 } from 'lucide-react';
 
 export const AdminLayout: React.FC = () => {
   const { user, isSuperAdmin, logout, loading } = useAuth();
   const navigate = useNavigate();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   if (loading) {
     return (
@@ -75,8 +78,90 @@ export const AdminLayout: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col md:flex-row">
-      {/* Sidebar */}
-      <aside className="w-full md:w-64 bg-slate-900 border-r border-slate-800/80 flex flex-col justify-between flex-shrink-0">
+      {/* Mobile Top Header (<= 767px) */}
+      <div className="md:hidden bg-slate-900 border-b border-slate-800 px-4 py-3 sticky top-0 z-40 flex items-center justify-between">
+        <div className="flex items-center space-x-2.5">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-600 flex items-center justify-center text-slate-950 font-black font-heading text-xs shadow-md">
+            TS
+          </div>
+          <div>
+            <h1 className="font-bold text-xs text-white font-heading tracking-tight leading-none">
+              TravelSaathi CMS
+            </h1>
+            <span className="text-[9px] text-amber-400 font-semibold uppercase tracking-wider block">
+              Admin Console
+            </span>
+          </div>
+        </div>
+
+        <button
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="p-2 rounded-xl bg-slate-800 text-slate-300 hover:text-white min-h-[44px] min-w-[44px] flex items-center justify-center"
+          aria-label="Toggle Admin Menu"
+        >
+          {mobileMenuOpen ? <X className="w-5 h-5 text-amber-400" /> : <Menu className="w-5 h-5" />}
+        </button>
+      </div>
+
+      {/* Mobile Dropdown Drawer (<= 767px) */}
+      {mobileMenuOpen && (
+        <div className="md:hidden bg-slate-900 border-b border-slate-800 p-4 space-y-3 animate-in slide-in-from-top-2">
+          <nav className="space-y-1">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  end={item.end}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={({ isActive }) =>
+                    `flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition min-h-[44px] ${
+                      isActive
+                        ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
+                        : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                    }`
+                  }
+                >
+                  <Icon className="w-4 h-4 flex-shrink-0" />
+                  <span>{item.label}</span>
+                </NavLink>
+              );
+            })}
+          </nav>
+
+          <div className="pt-3 border-t border-slate-800 space-y-2 text-xs">
+            <Link
+              to="/"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center space-x-2 px-3 py-2 rounded-xl text-slate-400 hover:text-amber-400 hover:bg-slate-800 transition min-h-[44px]"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Return to Public Portal</span>
+            </Link>
+
+            <div className="flex items-center justify-between pt-2 border-t border-slate-800">
+              <div className="truncate pr-2">
+                <p className="font-bold text-white truncate">{user.name}</p>
+                <span className="text-[10px] text-slate-500 truncate block">{user.email}</span>
+              </div>
+              <button
+                onClick={() => {
+                  logout();
+                  navigate('/');
+                }}
+                className="p-2 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition min-h-[44px] min-w-[44px] flex items-center justify-center"
+                title="Sign Out"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Desktop Sidebar (>= 768px) - 100% Preserved */}
+      <aside className="hidden md:flex w-64 bg-slate-900 border-r border-slate-800/80 flex-col justify-between flex-shrink-0 min-h-screen">
         <div>
           {/* Logo Brand Header */}
           <div className="p-6 border-b border-slate-800">

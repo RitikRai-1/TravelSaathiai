@@ -139,8 +139,78 @@ export const AdminUsersPage: React.FC = () => {
           <p className="text-sm font-semibold text-slate-400">No users match your criteria</p>
         </div>
       ) : (
-        <div className="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-xl">
-          <div className="overflow-x-auto">
+        <>
+          {/* Mobile Users Cards (<= 767px) */}
+          <div className="block md:hidden space-y-3">
+            {filteredUsers.map((u) => (
+              <div key={u.id} className="bg-slate-900 rounded-2xl border border-slate-800 p-4 space-y-3">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-amber-400 font-bold text-xs">
+                      {u.name.charAt(0)}
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-white text-sm">{u.name}</h3>
+                      <p className="text-[11px] text-slate-400">{u.email}</p>
+                    </div>
+                  </div>
+                  <span
+                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${getRoleBadge(
+                      u.role
+                    )}`}
+                  >
+                    {u.role}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between text-xs text-slate-400 pt-1 border-t border-slate-800/80">
+                  <span>{u.phone || 'No phone'} {u.location ? `• ${u.location}` : ''}</span>
+                  <span
+                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                      u.status === 'ACTIVE'
+                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                        : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+                    }`}
+                  >
+                    {u.status || 'ACTIVE'}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2 pt-1">
+                  <select
+                    disabled={updatingId === u.id || u.role === 'SUPER_ADMIN'}
+                    value={u.role}
+                    onChange={(e) => handleRoleChange(u.id, e.target.value)}
+                    className="flex-1 px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-300 focus:outline-none focus:border-amber-500 disabled:opacity-50 min-h-[44px]"
+                  >
+                    <option value="TOURIST">Tourist</option>
+                    <option value="BUSINESS_OWNER">Business Owner</option>
+                    <option value="BUSINESS_MODERATOR">Business Moderator</option>
+                    <option value="CONTENT_MANAGER">Content Manager</option>
+                    <option value="SUPER_ADMIN">Super Admin</option>
+                  </select>
+
+                  {u.role !== 'SUPER_ADMIN' && (
+                    <button
+                      disabled={updatingId === u.id}
+                      onClick={() => handleStatusToggle(u.id, u.status || 'ACTIVE')}
+                      className={`px-3 py-2 rounded-xl text-xs font-semibold transition min-h-[44px] flex items-center justify-center ${
+                        u.status === 'ACTIVE'
+                          ? 'bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/30'
+                          : 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/30'
+                      }`}
+                    >
+                      {u.status === 'ACTIVE' ? 'Suspend' : 'Activate'}
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Table (>= 768px) - 100% Preserved */}
+          <div className="hidden md:block bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-xl">
+            <div className="overflow-x-auto">
             <table className="w-full text-left text-xs text-slate-300">
               <thead className="bg-slate-950/80 text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-800">
                 <tr>
@@ -229,6 +299,7 @@ export const AdminUsersPage: React.FC = () => {
             </table>
           </div>
         </div>
+      </>
       )}
     </div>
   );

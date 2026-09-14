@@ -5,7 +5,9 @@ import { useTheme } from '../../context/ThemeContext';
 import { api } from '../../services/api';
 import { TravelSaathiLogo } from '../common/TravelSaathiLogo';
 import { LanguageSelector } from '../common/LanguageSelector';
+import { MobileNavbar } from './MobileNavbar';
 import { useLanguage } from '../../context/LanguageContext';
+
 import {
   Compass,
   Sparkles,
@@ -68,9 +70,15 @@ export const Navbar: React.FC = () => {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full max-w-full bg-[#0B192C] text-slate-100 border-b border-[#0F766E]/40 shadow-md">
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 sm:h-20">
+    <>
+      {/* Dedicated Smartphone Mobile Navigation (<= 767px) */}
+      <MobileNavbar />
+
+      {/* Existing Desktop & Tablet Navigation (>= 768px) - 100% untouched */}
+      <header className="sticky top-0 z-50 w-full max-w-full bg-[#0B192C] text-slate-100 border-b border-[#0F766E]/40 shadow-md hidden md:block">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 sm:h-20">
+
           {/* Logo */}
           <Link to="/" className="group flex-shrink-0">
             <TravelSaathiLogo variant="white" size="sm" className="sm:scale-100" />
@@ -488,5 +496,7 @@ export const Navbar: React.FC = () => {
         </div>
       )}
     </header>
+    </>
   );
 };
+

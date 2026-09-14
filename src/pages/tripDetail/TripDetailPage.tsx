@@ -7,6 +7,8 @@ import { useLanguage } from '../../context/LanguageContext';
 import { TaxiBookingModal } from '../../components/booking/TaxiBookingModal';
 import { IndianMonumentsSkyline } from '../../components/common/IndianMonumentsSkyline';
 import { SafeImage } from '../../components/common/SafeImage';
+import { MobileTripDetailView } from './MobileTripDetailView';
+import { useIsMobile } from '../../hooks/useIsMobile';
 import {
   Sparkles,
   BookmarkCheck,
@@ -52,6 +54,7 @@ export const TripDetailPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { t, formatDayTitle, formatSlotTitle, formatStopType } = useLanguage();
+  const isMobile = useIsMobile();
 
   const [trip, setTrip] = useState<GeneratedTrip | null>(null);
   const [loading, setLoading] = useState(true);
@@ -586,7 +589,30 @@ export const TripDetailPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <>
+      {/* Mobile Trip Detail View */}
+      <div className="block md:hidden">
+        <MobileTripDetailView
+          trip={trip}
+          selectedHotel={selectedHotel}
+          setSelectedHotel={handleSelectHotel}
+          cityHotels={cityHotels}
+          workflowStage={workflowStage}
+          setWorkflowStage={setWorkflowStage}
+          isSaved={isSaved}
+          onSaveTrip={handleSaveTrip}
+          isOptimizing={isOptimizing}
+          onOptimizeTrip={handleOptimizeBudget}
+          onBookTaxi={(pickup, drop) => {
+            setDefaultDrop(drop);
+            setBookingModalOpen(true);
+          }}
+          appliedOptimizations={appliedOptimizations}
+        />
+      </div>
+
+      {/* Desktop Trip Detail View */}
+      <div className="hidden md:block max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Header Banner */}
       <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200/80 dark:border-slate-700 shadow-sm overflow-hidden">
         <div className="relative h-64 sm:h-80 w-full">
@@ -2079,14 +2105,15 @@ export const TripDetailPage: React.FC = () => {
       <div className="pt-6">
         <IndianMonumentsSkyline className="w-full text-[#0F766E]/15" tagline="Bharat Ki Khoj Ab Aur Aasaan • Designed for India" />
       </div>
+    </div>
 
-      {/* Taxi Booking Modal */}
+      {/* Taxi Booking Modal (shared between mobile and desktop) */}
       <TaxiBookingModal
         taxi={activeTaxi}
         isOpen={bookingModalOpen}
         onClose={() => setBookingModalOpen(false)}
         defaultDrop={defaultDrop}
       />
-    </div>
+    </>
   );
 };

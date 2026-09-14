@@ -3,7 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../../services/api';
 import { City, TouristPlace, HiddenGem, Hotel, Restaurant, TaxiService } from '../../types';
 import { TaxiBookingModal } from '../../components/booking/TaxiBookingModal';
+import { MobileHomeView } from './MobileHomeView';
 import { useLanguage } from '../../context/LanguageContext';
+
 import { IndianMonumentsSkyline } from '../../components/common/IndianMonumentsSkyline';
 import { SafeImage } from '../../components/common/SafeImage';
 import {
@@ -143,8 +145,24 @@ export const HomePage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-16 pb-20">
-      {/* 0. TOP GREETING & QUICK ACTIONS BAR */}
+    <>
+      {/* Mobile-Only Dedicated Homepage (<= 767px) */}
+      <div className="block md:hidden">
+        <MobileHomeView
+          featuredCities={featuredCities}
+          featuredPlaces={featuredPlaces}
+          hiddenGems={hiddenGems}
+          featuredHotels={featuredHotels}
+          featuredRestaurants={featuredRestaurants}
+          featuredTaxis={featuredTaxis}
+          loading={loading}
+        />
+      </div>
+
+      {/* Desktop-Only Homepage (>= 768px) - 100% untouched */}
+      <div className="hidden md:block space-y-16 pb-20">
+        {/* 0. TOP GREETING & QUICK ACTIONS BAR */}
+
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         <div className="bg-[#FAF9F6] rounded-3xl p-6 sm:p-8 border border-[#0F766E]/20 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-1">
@@ -1084,6 +1102,7 @@ export const HomePage: React.FC = () => {
           ))}
         </div>
       </section>
+      </div>
 
       {/* Taxi Booking Modal */}
       <TaxiBookingModal
@@ -1091,6 +1110,7 @@ export const HomePage: React.FC = () => {
         isOpen={bookingModalOpen}
         onClose={() => setBookingModalOpen(false)}
       />
-    </div>
+    </>
   );
 };
+
