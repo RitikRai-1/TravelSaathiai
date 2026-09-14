@@ -266,7 +266,13 @@ export const getMyBookings = async (req: AuthRequest, res: Response): Promise<vo
     }
 
     const bookings = dbManager.query(
-      `SELECT b.*, t.service_name, t.driver_name, t.phone as driver_phone, t.vehicle_type as taxi_type,
+      `SELECT b.*,
+              b.pickup_address as pickup_location,
+              b.drop_address as drop_location,
+              b.pickup_date as travel_date,
+              b.estimated_fare as total_fare,
+              b.passengers as passengers_count,
+              t.service_name, t.driver_name, t.phone as driver_phone, t.vehicle_type as taxi_type,
               c.name as city_name
        FROM taxi_bookings b
        JOIN taxi_services t ON t.id = b.taxi_service_id
@@ -290,7 +296,12 @@ export const updateBookingStatus = async (req: AuthRequest, res: Response): Prom
     }
 
     const { id } = req.params;
-    const { status } = req.body;
+    let { status } = req.body;
+
+    // Normalize CONFIRMED to ACCEPTED
+    if (status === 'CONFIRMED') {
+      status = 'ACCEPTED';
+    }
 
     const validStatuses = ['PENDING', 'ACCEPTED', 'REJECTED', 'COMPLETED', 'CANCELLED'];
     if (!validStatuses.includes(status)) {
@@ -314,7 +325,7 @@ export const updateBookingStatus = async (req: AuthRequest, res: Response): Prom
         `Taxi Booking ${status}`,
         `Your taxi booking ${booking.booking_reference} has been marked as ${status}.`,
         'BOOKING',
-        '/dashboard',
+        '/profile?tab=bookings',
       ]
     );
 

@@ -132,9 +132,14 @@ export const getBusinessDashboard = async (req: AuthRequest, res: Response): Pro
     if (taxiIds.length > 0) {
       const placeholders = taxiIds.map(() => '?').join(',');
       bookings = dbManager.query(
-        `SELECT b.*, u.name as customer_name, u.email as customer_email, t.service_name
+        `SELECT b.*,
+                b.pickup_address as pickup_location,
+                b.drop_address as drop_location,
+                b.estimated_fare as fare_estimate,
+                b.status as booking_status,
+                u.name as customer_name, u.email as customer_email, t.service_name
          FROM taxi_bookings b
-         JOIN users u ON u.id = b.customer_id
+         LEFT JOIN users u ON u.id = b.customer_id
          JOIN taxi_services t ON t.id = b.taxi_service_id
          WHERE b.taxi_service_id IN (${placeholders})
          ORDER BY b.created_at DESC`,

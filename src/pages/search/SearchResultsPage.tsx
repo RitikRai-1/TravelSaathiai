@@ -533,7 +533,7 @@ export const SearchResultsPage: React.FC = () => {
                           src={photo}
                           alt={taxi.service_name || 'Taxi Service'}
                           className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-                          category="transport"
+                          category="taxi"
                         />
                         <div className="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-xs text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
                           {taxi.vehicle_type || 'Cab'}

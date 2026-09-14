@@ -226,16 +226,38 @@ export const getTripById = async (req: Request, res: Response): Promise<void> =>
     );
 
     for (const day of days) {
-      day.stops = dbManager.query(
+      day.dayNumber = day.day_number;
+      day.dayTitle = day.day_title;
+      const rawStops = dbManager.query(
         'SELECT * FROM trip_stops WHERE trip_day_id = ? ORDER BY stop_order ASC',
         [day.id]
       );
+      day.stops = rawStops.map((s: any) => ({
+        ...s,
+        stopOrder: s.stop_order,
+        stopType: s.stop_type,
+        entityType: s.entity_type,
+        entityId: s.entity_id,
+        title: s.custom_title,
+        imageUrl: s.image_url,
+        description: s.description || '',
+        startTime: s.start_time,
+        durationHours: s.duration_hours,
+        estimatedCost: s.estimated_cost,
+        distanceKm: s.travel_distance_km,
+        travelTimeMins: s.travel_time_mins,
+        transportNotes: s.transport_notes,
+      }));
     }
 
     trip.days = days;
     trip.interests = JSON.parse(trip.interests_json || '[]');
     trip.routeSummary = JSON.parse(trip.route_summary_json || '{}');
     trip.budget = JSON.parse(trip.budget_breakdown_json || '{}');
+    trip.durationDays = trip.days_count;
+    trip.totalEstimatedCost = trip.estimated_total_cost;
+    trip.travelCompanion = trip.traveller_type;
+    trip.transportMode = trip.transport_mode;
     trip.city = {
       id: trip.destination_city_id,
       name: trip.city_name,

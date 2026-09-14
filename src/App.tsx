@@ -80,8 +80,8 @@ const ScrollToTop: React.FC = () => {
       title = 'Secret & Offbeat Hidden Gems of India | TravelSaathi AI';
     } else if (pathname === '/search') {
       title = 'Omni Search Destinations & Stays | TravelSaathi AI';
-    } else if (pathname === '/profile' || pathname === '/my-account') {
-      title = 'My Profile & Account Settings | TravelSaathi AI';
+    } else if (pathname === '/profile' || pathname === '/my-account' || pathname === '/my-bookings') {
+      title = 'My Profile & Bookings | TravelSaathi AI';
     } else if (pathname === '/dashboard' || pathname === '/my-trips') {
       title = 'My Travel Portfolio & Saved Itineraries | TravelSaathi AI';
 
@@ -193,6 +193,7 @@ export const App: React.FC = () => {
           {/* User Portfolio & Dashboard */}
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/my-account" element={<ProfilePage />} />
+          <Route path="/my-bookings" element={<ProfilePage defaultTab="bookings" />} />
           <Route path="/dashboard" element={<TouristDashboardPage />} />
 
           <Route path="/my-trips" element={<TouristDashboardPage />} />

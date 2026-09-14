@@ -28,12 +28,20 @@ import {
 } from 'lucide-react';
 import { IndianMonumentsSkyline } from '../../components/common/IndianMonumentsSkyline';
 
-export const ProfilePage: React.FC = () => {
+interface ProfilePageProps {
+  defaultTab?: 'trips' | 'bookings' | 'saved' | 'security';
+}
+
+export const ProfilePage: React.FC<ProfilePageProps> = ({ defaultTab }) => {
   const { user, loading: authLoading, logout, updateUser, refreshUser, isSuperAdmin, isBusinessOwner } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [activeTab, setActiveTab] = useState<'trips' | 'bookings' | 'saved' | 'security'>('trips');
+  const queryParams = new URLSearchParams(location.search);
+  const tabParam = queryParams.get('tab') as 'trips' | 'bookings' | 'saved' | 'security' | null;
+  const initialTab = defaultTab || tabParam || 'trips';
+
+  const [activeTab, setActiveTab] = useState<'trips' | 'bookings' | 'saved' | 'security'>(initialTab);
   const [trips, setTrips] = useState<any[]>([]);
   const [bookings, setBookings] = useState<TaxiBooking[]>([]);
   const [loadingData, setLoadingData] = useState(false);
@@ -522,47 +530,57 @@ export const ProfilePage: React.FC = () => {
               </div>
             ) : (
               <div className="space-y-3">
-                {bookings.map((booking) => (
-                  <div
-                    key={booking.id}
-                    className="p-4 rounded-2xl bg-white dark:bg-[#0B192C] border border-slate-200 dark:border-[#0F766E]/40 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-                  >
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-sm text-slate-900 dark:text-white">
-                          {booking.pickup_location} → {booking.drop_location}
-                        </span>
-                        <span
-                          className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md ${
-                            booking.status === 'CONFIRMED'
-                              ? 'bg-emerald-100 text-emerald-800'
-                              : booking.status === 'CANCELLED'
-                              ? 'bg-rose-100 text-rose-800'
-                              : 'bg-amber-100 text-amber-800'
-                          }`}
-                        >
-                          {booking.status}
-                        </span>
-                      </div>
-                      <p className="text-xs text-slate-500">
-                        Date: {booking.travel_date} • Passengers: {booking.passengers_count || 1}
-                      </p>
-                      {booking.total_fare && (
-                        <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                          Estimated Fare: ₹{booking.total_fare}
-                        </p>
-                      )}
-                    </div>
+                {bookings.map((booking) => {
+                  const pickupLoc = booking.pickup_address || booking.pickup_location;
+                  const dropLoc = booking.drop_address || booking.drop_location;
+                  const travelDate = booking.pickup_date || booking.travel_date;
+                  const passCount = booking.passengers || booking.passengers_count || 1;
+                  const totalFare = booking.estimated_fare || booking.total_fare;
+                  const isConfirmed = booking.status === 'CONFIRMED' || booking.status === 'ACCEPTED';
+                  const isCancelled = booking.status === 'CANCELLED' || booking.status === 'REJECTED';
 
-                    <Link
-                      to="/taxis"
-                      className="text-xs font-bold text-[#1B5E20] dark:text-[#2DD4BF] hover:underline flex items-center gap-1 self-start sm:self-center"
+                  return (
+                    <div
+                      key={booking.id}
+                      className="p-4 rounded-2xl bg-white dark:bg-[#0B192C] border border-slate-200 dark:border-[#0F766E]/40 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                     >
-                      <span>Taxi Details</span>
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </Link>
-                  </div>
-                ))}
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-sm text-slate-900 dark:text-white">
+                            {pickupLoc} → {dropLoc}
+                          </span>
+                          <span
+                            className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md ${
+                              isConfirmed
+                                ? 'bg-emerald-100 text-emerald-800'
+                                : isCancelled
+                                ? 'bg-rose-100 text-rose-800'
+                                : 'bg-amber-100 text-amber-800'
+                            }`}
+                          >
+                            {booking.status}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-500">
+                          Date: {travelDate} • Passengers: {passCount}
+                        </p>
+                        {totalFare && (
+                          <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                            Estimated Fare: ₹{totalFare}
+                          </p>
+                        )}
+                      </div>
+
+                      <Link
+                        to="/taxis"
+                        className="text-xs font-bold text-[#1B5E20] dark:text-[#2DD4BF] hover:underline flex items-center gap-1 self-start sm:self-center"
+                      >
+                        <span>Taxi Details</span>
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </Link>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>

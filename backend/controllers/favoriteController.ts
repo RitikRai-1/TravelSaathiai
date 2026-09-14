@@ -57,16 +57,39 @@ export const getFavorites = async (req: AuthRequest, res: Response): Promise<voi
     for (const f of favs) {
       if (f.entity_type === 'PLACE') {
         const p = dbManager.queryOne<any>('SELECT * FROM tourist_places WHERE id = ?', [f.entity_id]);
-        if (p) places.push(p);
+        if (p) {
+          places.push({
+            ...p,
+            photos: JSON.parse(p.photos_json || '[]'),
+          });
+        }
       } else if (f.entity_type === 'HOTEL') {
         const h = dbManager.queryOne<any>('SELECT * FROM hotels WHERE id = ?', [f.entity_id]);
-        if (h) hotels.push(h);
+        if (h) {
+          hotels.push({
+            ...h,
+            photos: JSON.parse(h.photos_json || '[]'),
+            facilities: JSON.parse(h.facilities_json || '[]'),
+          });
+        }
       } else if (f.entity_type === 'RESTAURANT') {
         const r = dbManager.queryOne<any>('SELECT * FROM restaurants WHERE id = ?', [f.entity_id]);
-        if (r) restaurants.push(r);
+        if (r) {
+          restaurants.push({
+            ...r,
+            photos: JSON.parse(r.photos_json || '[]'),
+            popular_dishes: JSON.parse(r.popular_dishes_json || '[]'),
+            facilities: JSON.parse(r.facilities_json || '[]'),
+          });
+        }
       } else if (f.entity_type === 'TAXI') {
         const t = dbManager.queryOne<any>('SELECT * FROM taxi_services WHERE id = ?', [f.entity_id]);
-        if (t) taxis.push(t);
+        if (t) {
+          taxis.push({
+            ...t,
+            vehicle_photos: JSON.parse(t.vehicle_photos_json || '[]'),
+          });
+        }
       } else if (f.entity_type === 'CITY') {
         const c = dbManager.queryOne<any>('SELECT * FROM cities WHERE id = ?', [f.entity_id]);
         if (c) cities.push(c);
