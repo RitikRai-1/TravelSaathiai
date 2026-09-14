@@ -25,10 +25,28 @@ class DatabaseManager {
       // Safe schema migration for newly added columns
       try {
         this.db.run("ALTER TABLE restaurants ADD COLUMN food_type TEXT DEFAULT 'both';");
-        this.save();
-      } catch {
-        // column already exists, safe to ignore
-      }
+      } catch {}
+      try {
+        this.db.run("ALTER TABLE users ADD COLUMN mobile_verified INTEGER DEFAULT 0;");
+      } catch {}
+      try {
+        this.db.run("ALTER TABLE profiles ADD COLUMN mobile_number TEXT;");
+      } catch {}
+      try {
+        this.db.run("ALTER TABLE profiles ADD COLUMN mobile_verified INTEGER DEFAULT 0;");
+      } catch {}
+      try {
+        this.db.run(`CREATE TABLE IF NOT EXISTS otps (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          mobile_number TEXT NOT NULL,
+          otp_code TEXT NOT NULL,
+          purpose TEXT NOT NULL,
+          attempts INTEGER DEFAULT 0,
+          expires_at DATETIME NOT NULL,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );`);
+      } catch {}
+      this.save();
     } else {
       this.db = new SQL.Database();
       const schemaPath = path.join(__dirname, 'schema.sql');

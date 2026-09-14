@@ -213,12 +213,23 @@ export const Navbar: React.FC = () => {
                       )}
 
                       <Link
-                        to="/dashboard"
+                        to="/profile"
+                        onClick={() => setUserDropdownOpen(false)}
                         className="flex items-center space-x-2.5 px-4 py-2.5 text-sm font-semibold text-slate-200 hover:bg-[#1E3E62]/50 hover:text-[#2DD4BF] transition"
                       >
-                        <UserIcon className="w-4 h-4 text-slate-400" />
+                        <UserIcon className="w-4 h-4 text-[#2DD4BF]" />
+                        <span>My Profile / Account</span>
+                      </Link>
+
+                      <Link
+                        to="/dashboard"
+                        onClick={() => setUserDropdownOpen(false)}
+                        className="flex items-center space-x-2.5 px-4 py-2.5 text-sm font-semibold text-slate-200 hover:bg-[#1E3E62]/50 hover:text-[#2DD4BF] transition"
+                      >
+                        <Compass className="w-4 h-4 text-slate-400" />
                         <span>Tourist Dashboard</span>
                       </Link>
+
 
                       <Link
                         to="/saved"
@@ -408,13 +419,23 @@ export const Navbar: React.FC = () => {
                 )}
 
                 <Link
+                  to="/profile"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center space-x-2.5 px-3.5 py-2.5 text-sm font-semibold text-slate-200 hover:bg-[#1E3E62]/40 rounded-xl"
+                >
+                  <UserIcon className="w-4 h-4 text-[#2DD4BF]" />
+                  <span>My Profile / Account</span>
+                </Link>
+
+                <Link
                   to="/dashboard"
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex items-center space-x-2.5 px-3.5 py-2.5 text-sm font-semibold text-slate-200 hover:bg-[#1E3E62]/40 rounded-xl"
                 >
-                  <UserIcon className="w-4 h-4 text-slate-400" />
+                  <Compass className="w-4 h-4 text-slate-400" />
                   <span>Tourist Dashboard</span>
                 </Link>
+
 
                 <Link
                   to="/saved"

@@ -77,13 +77,13 @@ export const TouristDashboardPage: React.FC = () => {
   };
 
   // Calculate dynamic stats
-  const tripsCount = trips.length > 0 ? trips.length : 5;
+  const tripsCount = trips.length;
   const uniqueDestinations = trips.length > 0
     ? new Set(trips.map((t) => t.city_name)).size
-    : 12;
+    : 0;
   const uniqueStates = trips.length > 0
     ? Math.max(1, Math.ceil(uniqueDestinations / 2))
-    : 8;
+    : 0;
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-8">
@@ -92,18 +92,19 @@ export const TouristDashboardPage: React.FC = () => {
         <div className="flex items-center justify-between border-b border-slate-100 pb-5">
           <div className="flex items-center space-x-4">
             <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-[#1B5E20] to-[#2E7D32] text-white flex items-center justify-center font-bold text-2xl font-heading shadow-md shadow-[#1B5E20]/20">
-              {user?.name ? user.name.charAt(0) : 'T'}
+              {user?.name ? user.name.charAt(0).toUpperCase() : 'T'}
             </div>
             <div>
               <h1 className="text-xl sm:text-2xl font-bold text-slate-900 font-heading">
                 {user?.name || 'Traveler'}
               </h1>
-              <p className="text-xs text-slate-500">{user?.email || 'tourist@travelsaathi.ai'}</p>
+              <p className="text-xs text-slate-500">{user?.email || (user?.mobile_number ? `+91 ${user.mobile_number}` : '')}</p>
               <span className="inline-block mt-1 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-100 text-[#1B5E20]">
                 {user?.role || 'TOURIST'}
               </span>
             </div>
           </div>
+
 
           <Link
             to="/settings"

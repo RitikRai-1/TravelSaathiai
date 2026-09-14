@@ -17,8 +17,11 @@ const router = Router();
 // ==================== AUTHENTICATION ====================
 router.post('/auth/signup', authCtrl.signup);
 router.post('/auth/login', authCtrl.login);
+router.post('/auth/send-otp', authCtrl.sendOtp);
+router.post('/auth/verify-otp', authCtrl.verifyOtp);
 router.get('/auth/me', authMiddleware, authCtrl.me);
 router.put('/auth/profile', authMiddleware, authCtrl.updateProfile);
+
 
 // ==================== PUBLIC CMS & SETTINGS ====================
 router.get('/cms/settings', async (req: Request, res: Response) => {

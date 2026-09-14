@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
   password_hash TEXT NOT NULL,
   role TEXT NOT NULL CHECK(role IN ('SUPER_ADMIN', 'CONTENT_MANAGER', 'BUSINESS_MODERATOR', 'BUSINESS_OWNER', 'TOURIST')),
   phone TEXT,
+  mobile_verified INTEGER DEFAULT 0,
   status TEXT DEFAULT 'ACTIVE' CHECK(status IN ('ACTIVE', 'INACTIVE', 'SUSPENDED')),
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -17,7 +18,19 @@ CREATE TABLE IF NOT EXISTS profiles (
   bio TEXT,
   avatar_url TEXT,
   location TEXT,
+  mobile_number TEXT,
+  mobile_verified INTEGER DEFAULT 0,
   preferences_json TEXT
+);
+
+CREATE TABLE IF NOT EXISTS otps (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  mobile_number TEXT NOT NULL,
+  otp_code TEXT NOT NULL,
+  purpose TEXT NOT NULL,
+  attempts INTEGER DEFAULT 0,
+  expires_at DATETIME NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS states (

@@ -41,8 +41,11 @@ export const api = {
   // Auth
   login: (credentials: any) => request<{ success: boolean; token: string; user: any; message?: string }>('/auth/login', { method: 'POST', body: JSON.stringify(credentials) }),
   signup: (userData: any) => request<{ success: boolean; token: string; user: any; message?: string }>('/auth/signup', { method: 'POST', body: JSON.stringify(userData) }),
+  sendOtp: (data: { mobile_number: string; purpose?: 'LOGIN' | 'SIGNUP' }) => request<{ success: boolean; message: string; cooldown_seconds?: number; simulated_otp?: string }>('/auth/send-otp', { method: 'POST', body: JSON.stringify(data) }),
+  verifyOtp: (data: { mobile_number: string; otp: string; purpose?: 'LOGIN' | 'SIGNUP'; full_name?: string }) => request<{ success: boolean; token: string; user: any; message?: string }>('/auth/verify-otp', { method: 'POST', body: JSON.stringify(data) }),
   getMe: () => request<{ success: boolean; user: any }>('/auth/me'),
-  updateProfile: (profile: any) => request<{ success: boolean; message: string }>('/auth/profile', { method: 'PUT', body: JSON.stringify(profile) }),
+  updateProfile: (profile: any) => request<{ success: boolean; message: string; user?: any }>('/auth/profile', { method: 'PUT', body: JSON.stringify(profile) }),
+
 
   // CMS
   getHomepageCms: () => request<{ success: boolean; data: any }>('/cms/homepage'),

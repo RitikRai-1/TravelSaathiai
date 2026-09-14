@@ -18,7 +18,9 @@ import { TaxiNearMePage } from './pages/taxis/TaxiNearMePage';
 import { TripPlannerPage } from './pages/tripPlanner/TripPlannerPage';
 import { TripDetailPage } from './pages/tripDetail/TripDetailPage';
 import { TouristDashboardPage } from './pages/dashboard/TouristDashboardPage';
+import { ProfilePage } from './pages/profile/ProfilePage';
 import { SavedPage } from './pages/saved/SavedPage';
+
 import { SettingsPage } from './pages/settings/SettingsPage';
 import { SearchResultsPage } from './pages/search/SearchResultsPage';
 import { AiAssistantWidget } from './components/chat/AiAssistantWidget';
@@ -76,8 +78,11 @@ const ScrollToTop: React.FC = () => {
       title = 'Secret & Offbeat Hidden Gems of India | TravelSaathi AI';
     } else if (pathname === '/search') {
       title = 'Omni Search Destinations & Stays | TravelSaathi AI';
+    } else if (pathname === '/profile' || pathname === '/my-account') {
+      title = 'My Profile & Account Settings | TravelSaathi AI';
     } else if (pathname === '/dashboard' || pathname === '/my-trips') {
       title = 'My Travel Portfolio & Saved Itineraries | TravelSaathi AI';
+
     } else if (pathname === '/saved') {
       title = 'My Saved Places & Hotels | TravelSaathi AI';
     } else if (pathname === '/settings') {
@@ -182,7 +187,10 @@ export const App: React.FC = () => {
           <Route path="/trips/:id" element={<TripDetailPage />} />
 
           {/* User Portfolio & Dashboard */}
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/my-account" element={<ProfilePage />} />
           <Route path="/dashboard" element={<TouristDashboardPage />} />
+
           <Route path="/my-trips" element={<TouristDashboardPage />} />
           <Route path="/saved" element={<SavedPage />} />
           <Route path="/settings" element={<SettingsPage />} />

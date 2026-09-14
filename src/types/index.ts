@@ -4,11 +4,15 @@ export interface User {
   email: string;
   role: 'SUPER_ADMIN' | 'CONTENT_MANAGER' | 'BUSINESS_MODERATOR' | 'BUSINESS_OWNER' | 'TOURIST';
   phone?: string;
+  mobile_number?: string;
+  mobile_verified?: boolean;
   status?: string;
   bio?: string;
   avatar_url?: string;
   location?: string;
+  created_at?: string;
 }
+
 
 export interface State {
   id: number;

@@ -8,6 +8,9 @@ interface AuthContextType {
   loading: boolean;
   login: (credentials: any) => Promise<User>;
   signup: (userData: any) => Promise<User>;
+  loginWithOtp: (data: { mobile_number: string; otp: string }) => Promise<User>;
+  signupWithOtp: (data: { mobile_number: string; otp: string; full_name?: string }) => Promise<User>;
+  refreshUser: () => Promise<void>;
   logout: () => void;
   updateUser: (updatedData: Partial<User>) => void;
   isSuperAdmin: boolean;
@@ -16,6 +19,7 @@ interface AuthContextType {
   isBusinessOwner: boolean;
   isTourist: boolean;
 }
+
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -69,6 +73,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     throw new Error(res.message || 'Signup failed');
   };
 
+  const loginWithOtp = async (data: { mobile_number: string; otp: string }): Promise<User> => {
+    const res = await api.verifyOtp({ ...data, purpose: 'LOGIN' });
+    if (res.success && res.token) {
+      setToken(res.token);
+      setTokenState(res.token);
+      setUser(res.user);
+      return res.user;
+    }
+    throw new Error(res.message || 'OTP login failed');
+  };
+
+  const signupWithOtp = async (data: { mobile_number: string; otp: string; full_name?: string }): Promise<User> => {
+    const res = await api.verifyOtp({ ...data, purpose: 'SIGNUP' });
+    if (res.success && res.token) {
+      setToken(res.token);
+      setTokenState(res.token);
+      setUser(res.user);
+      return res.user;
+    }
+    throw new Error(res.message || 'OTP registration failed');
+  };
+
+  const refreshUser = async () => {
+    try {
+      const res = await api.getMe();
+      if (res.success && res.user) {
+        setUser(res.user);
+      }
+    } catch {
+      // ignore
+    }
+  };
+
   const logout = () => {
     removeToken();
     setTokenState(null);
@@ -95,6 +132,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loading,
         login,
         signup,
+        loginWithOtp,
+        signupWithOtp,
+        refreshUser,
         logout,
         updateUser,
         isSuperAdmin,
@@ -104,6 +144,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isTourist,
       }}
     >
+
       {children}
     </AuthContext.Provider>
   );
