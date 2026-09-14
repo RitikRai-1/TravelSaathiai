@@ -3,6 +3,7 @@ import { api } from '../../services/api';
 import { TaxiService } from '../../types';
 import { TaxiBookingModal } from '../../components/booking/TaxiBookingModal';
 import { IndianMonumentsSkyline } from '../../components/common/IndianMonumentsSkyline';
+import { SafeImage } from '../../components/common/SafeImage';
 import {
   MapPin,
   Compass,
@@ -199,9 +200,20 @@ export const TaxiNearMePage: React.FC = () => {
               className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs card-hover flex flex-col sm:flex-row items-center justify-between gap-5"
             >
               <div className="flex items-center space-x-4 w-full sm:w-auto">
-                <div className="w-14 h-14 rounded-2xl bg-emerald-100 text-[#1B5E20] flex items-center justify-center shrink-0">
-                  <Car className="w-7 h-7" />
-                </div>
+                {taxi.vehicle_photos && taxi.vehicle_photos.length > 0 ? (
+                  <div className="w-14 h-14 rounded-2xl overflow-hidden shrink-0 border border-slate-200">
+                    <SafeImage
+                      src={taxi.vehicle_photos[0]}
+                      alt={taxi.service_name}
+                      category="taxi"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-14 h-14 rounded-2xl bg-emerald-100 text-[#1B5E20] flex items-center justify-center shrink-0">
+                    <Car className="w-7 h-7" />
+                  </div>
+                )}
                 <div className="space-y-1">
                   <div className="flex items-center space-x-2">
                     <h3 className="font-bold text-base text-slate-900 font-heading">{taxi.service_name}</h3>

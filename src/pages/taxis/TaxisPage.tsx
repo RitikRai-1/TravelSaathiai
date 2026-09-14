@@ -138,9 +138,20 @@ export const TaxisPage: React.FC = () => {
               <div>
                 <div className="flex items-start justify-between">
                   <div className="flex items-center space-x-3">
-                    <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-[#1B5E20] flex items-center justify-center font-bold text-lg">
-                      <Car className="w-6 h-6" />
-                    </div>
+                    {taxi.vehicle_photos && taxi.vehicle_photos.length > 0 ? (
+                      <div className="w-12 h-12 rounded-2xl overflow-hidden shrink-0 border border-slate-200">
+                        <SafeImage
+                          src={taxi.vehicle_photos[0]}
+                          alt={taxi.service_name}
+                          category="taxi"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-[#1B5E20] flex items-center justify-center font-bold text-lg shrink-0">
+                        <Car className="w-6 h-6" />
+                      </div>
+                    )}
                     <div>
                       <span className="text-[10px] font-bold uppercase tracking-wider text-[#1B5E20]">
                         {taxi.vehicle_type} • {taxi.city_name}

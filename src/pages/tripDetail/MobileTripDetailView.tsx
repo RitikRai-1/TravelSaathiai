@@ -241,9 +241,16 @@ export const MobileTripDetailView: React.FC<MobileTripDetailViewProps> = ({
             <h3 className="text-sm font-bold text-slate-900 dark:text-white font-heading">Select Your Stay</h3>
           </div>
 
+          {((trip as any).noSuitableHotelWithinBudget) && (
+            <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 mb-2">
+              ⚠️ No hotel found within your current budget. Cheapest options shown below.
+            </div>
+          )}
+
           <div className="space-y-2">
             {cityHotels.slice(0, 5).map((hotel) => {
               const isSelected = selectedHotel?.id === hotel.id;
+              const budgetTag = (hotel as any).budgetTag;
               return (
                 <button
                   key={hotel.id}
@@ -265,10 +272,18 @@ export const MobileTripDetailView: React.FC<MobileTripDetailViewProps> = ({
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{hotel.name}</p>
-                      <div className="flex items-center gap-2 text-[10px] text-slate-500">
+                      <div className="flex items-center gap-2 text-[10px] text-slate-500 flex-wrap">
                         <span>⭐ {hotel.rating || 4.5}</span>
                         <span>•</span>
                         <span className="font-bold text-[#0F766E] dark:text-[#2DD4BF]">₹{hotel.price_per_night?.toLocaleString('en-IN')}/night</span>
+                        {budgetTag && (
+                          <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
+                            budgetTag === 'Budget Friendly' ? 'bg-emerald-100 text-emerald-800' :
+                            budgetTag === 'Within Budget' ? 'bg-blue-100 text-blue-800' : 'bg-amber-100 text-amber-800'
+                          }`}>
+                            {budgetTag}
+                          </span>
+                        )}
                       </div>
                     </div>
                     {isSelected && <CheckCircle2 className="w-5 h-5 text-[#0F766E] shrink-0" />}

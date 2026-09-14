@@ -112,15 +112,15 @@ export const TaxiBookingModal: React.FC<TaxiBookingModalProps> = ({
               <div className="p-4 bg-slate-50 rounded-2xl text-left text-xs space-y-1.5 border border-slate-100">
                 <div className="flex justify-between">
                   <span className="text-slate-500">Pick-up:</span>
-                  <span className="font-bold text-slate-800">{successBooking.pickup_location}</span>
+                  <span className="font-bold text-slate-800">{successBooking.pickup_location || successBooking.pickup_address || pickupAddress}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500">Drop-off:</span>
-                  <span className="font-bold text-slate-800">{successBooking.drop_location}</span>
+                  <span className="font-bold text-slate-800">{successBooking.drop_location || successBooking.drop_address || dropAddress}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500">Passengers:</span>
-                  <span className="font-bold text-slate-800">{successBooking.passengers_count}</span>
+                  <span className="font-bold text-slate-800">{successBooking.passengers_count || successBooking.passengers || passengers}</span>
                 </div>
                 <div className="flex justify-between border-t border-slate-200 pt-1.5 mt-1.5">
                   <span className="font-bold text-slate-700">Estimated Total:</span>

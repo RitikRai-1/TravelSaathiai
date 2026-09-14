@@ -1364,6 +1364,18 @@ export const TripDetailPage: React.FC = () => {
               </Link>
             </div>
 
+            {trip.noSuitableHotelWithinBudget && (
+              <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-start space-x-3">
+                <span className="text-lg">⚠️</span>
+                <div>
+                  <p className="text-sm font-bold text-amber-800">No suitable hotel found within your current budget.</p>
+                  <p className="text-xs text-amber-700 mt-0.5">
+                    All available hotels exceed your accommodation budget allocation. The cheapest available options are shown below. Consider increasing your budget or reducing the trip duration.
+                  </p>
+                </div>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {hotelsList.slice(0, 3).map((hotel: any, idx: number) => {
                 const photo =
@@ -1388,6 +1400,15 @@ export const TripDetailPage: React.FC = () => {
                           <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
                           <span>{hotel.rating || 4.5}</span>
                         </div>
+                        {hotel.budgetTag && (
+                          <div className={`absolute bottom-3 left-3 text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm ${
+                            hotel.budgetTag === 'Budget Friendly' ? 'bg-emerald-100 text-emerald-800' :
+                            hotel.budgetTag === 'Within Budget' ? 'bg-blue-100 text-blue-800' :
+                            'bg-amber-100 text-amber-800'
+                          }`}>
+                            {hotel.budgetTag === 'Budget Friendly' ? '💚 ' : hotel.budgetTag === 'Within Budget' ? '✅ ' : '⚠️ '}{hotel.budgetTag}
+                          </div>
+                        )}
                         <div className="absolute bottom-3 right-3 bg-[#0B192C]/85 backdrop-blur-md text-white text-xs font-bold px-2.5 py-1 rounded-lg">
                           ₹{hotel.price_per_night || 2800} / night
                         </div>
@@ -1514,6 +1535,15 @@ export const TripDetailPage: React.FC = () => {
                           <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
                           <span>{dining.rating || 4.6}</span>
                         </div>
+                        {dining.budgetTag && (
+                          <div className={`absolute bottom-3 left-3 text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm ${
+                            dining.budgetTag === 'Budget Friendly' ? 'bg-emerald-100 text-emerald-800' :
+                            dining.budgetTag === 'Within Budget' ? 'bg-blue-100 text-blue-800' :
+                            'bg-amber-100 text-amber-800'
+                          }`}>
+                            {dining.budgetTag === 'Budget Friendly' ? '💚 ' : dining.budgetTag === 'Within Budget' ? '✅ ' : '⚠️ '}{dining.budgetTag}
+                          </div>
+                        )}
                         <div className="absolute bottom-3 right-3 bg-slate-950/80 backdrop-blur-md text-white text-xs font-bold px-2.5 py-1 rounded-lg">
                           ₹{dining.avg_cost_for_two || 600} for two
                         </div>

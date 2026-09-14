@@ -568,12 +568,20 @@ export class RecommendationEngine {
 
     const hotelNightlyRate = nightsCount > 0 ? Math.round(totalHotelCost / nightsCount) : 0;
 
+    // Sort restaurants by affordability relative to per-meal budget for smarter assignment
+    const perMealBudget = foodPerPersonPerDay / 3;
+    const sortedByAffordability = [...restaurants].sort((a, b) => {
+      const aCost = (a.avg_cost_for_two || 600) / 2;
+      const bCost = (b.avg_cost_for_two || 600) / 2;
+      return Math.abs(aCost - perMealBudget) - Math.abs(bCost - perMealBudget);
+    });
+
     for (let d = 1; d <= input.daysCount; d++) {
       const dayStops: GeneratedStop[] = [];
       let stopOrder = 1;
 
       // 1. Morning Breakfast (08:30 AM)
-      const breakfastRest = restaurants[d % restaurants.length] || restaurants[0];
+      const breakfastRest = sortedByAffordability[d % sortedByAffordability.length] || restaurants[0];
       const breakfastCost = breakfastSharePerPerson * input.travellersCount;
       const breakfastPhoto = safeParseJsonArray(breakfastRest.photos_json)[0] || 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80';
 
@@ -631,7 +639,7 @@ export class RecommendationEngine {
       });
 
       // 3. Afternoon Lunch (01:30 PM)
-      const lunchRest = restaurants[(d + 1) % restaurants.length] || breakfastRest;
+      const lunchRest = sortedByAffordability[(d + 1) % sortedByAffordability.length] || breakfastRest;
       const lunchCost = lunchSharePerPerson * input.travellersCount;
       const lunchPhoto = safeParseJsonArray(lunchRest.photos_json)[0] || 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80';
 
@@ -717,7 +725,7 @@ export class RecommendationEngine {
       }
 
       // 6. Evening Dinner (08:00 PM)
-      const dinnerRest = restaurants[(d + 2) % restaurants.length] || lunchRest;
+      const dinnerRest = sortedByAffordability[(d + 2) % sortedByAffordability.length] || lunchRest;
       const dinnerCost = dinnerSharePerPerson * input.travellersCount;
       const dinnerPhoto = safeParseJsonArray(dinnerRest.photos_json)[0] || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80';
 
@@ -870,18 +878,67 @@ export class RecommendationEngine {
       transitAdvice = `Local verified taxi fleet drivers are available round-the-clock for pre-booked airport and full-day monument tours.`;
     }
 
-    const recommendedHotels = hotels.slice(0, 3).map((h) => ({
-      ...h,
-      photos: safeParseJsonArray(h.photos_json),
-      facilities: safeParseJsonArray(h.facilities_json),
-    }));
+    // ═══ BUDGET-TAGGED HOTEL RECOMMENDATIONS ═══
+    // Calculate total stay cost for each hotel and assign budget suitability tags
+    const hotelBudgetAllocation = effectiveBudget * 0.45; // up to 45% of budget for accommodation
+    const taggedHotels = hotels.map((h: any) => {
+      const stayCost = h.price_per_night * nightsCount * roomsNeeded;
+      let budgetTag: 'Budget Friendly' | 'Within Budget' | 'Higher Budget';
+      if (stayCost <= hotelBudgetAllocation * 0.55) {
+        budgetTag = 'Budget Friendly';
+      } else if (stayCost <= hotelBudgetAllocation) {
+        budgetTag = 'Within Budget';
+      } else {
+        budgetTag = 'Higher Budget';
+      }
+      return {
+        ...h,
+        photos: safeParseJsonArray(h.photos_json),
+        facilities: safeParseJsonArray(h.facilities_json),
+        stayCost,
+        budgetTag,
+      };
+    });
 
-    const recommendedRestaurants = restaurants.slice(0, 3).map((r) => ({
-      ...r,
-      photos: safeParseJsonArray(r.photos_json),
-      popular_dishes: safeParseJsonArray(r.popular_dishes_json),
-      facilities: safeParseJsonArray(r.facilities_json),
-    }));
+    // Prioritize Budget Friendly and Within Budget hotels
+    const affordableTaggedHotels = taggedHotels.filter((h: any) => h.budgetTag !== 'Higher Budget');
+    const noSuitableHotelWithinBudget = affordableTaggedHotels.length === 0 && taggedHotels.length > 0;
+
+    let recommendedHotels: any[];
+    if (affordableTaggedHotels.length > 0) {
+      recommendedHotels = affordableTaggedHotels.slice(0, 3);
+    } else {
+      // All hotels exceed budget, show cheapest with a warning
+      recommendedHotels = taggedHotels.slice(0, 3);
+    }
+
+    // ═══ BUDGET-TAGGED RESTAURANT RECOMMENDATIONS ═══
+    const perMealBudgetPerPerson = foodPerPersonPerDay / 3; // breakfast + lunch + dinner
+    const taggedRestaurants = restaurants.map((r: any) => {
+      const estimatedMealPerPerson = (r.avg_cost_for_two || 600) / 2;
+      let budgetTag: 'Budget Friendly' | 'Within Budget' | 'Higher Budget';
+      if (estimatedMealPerPerson <= perMealBudgetPerPerson * 0.7) {
+        budgetTag = 'Budget Friendly';
+      } else if (estimatedMealPerPerson <= perMealBudgetPerPerson * 1.3) {
+        budgetTag = 'Within Budget';
+      } else {
+        budgetTag = 'Higher Budget';
+      }
+      return {
+        ...r,
+        photos: safeParseJsonArray(r.photos_json),
+        popular_dishes: safeParseJsonArray(r.popular_dishes_json),
+        facilities: safeParseJsonArray(r.facilities_json),
+        estimatedMealPerPerson,
+        budgetTag,
+      };
+    });
+
+    // Prioritize affordable restaurants
+    const affordableRestaurants = taggedRestaurants.filter((r: any) => r.budgetTag !== 'Higher Budget');
+    const recommendedRestaurants = affordableRestaurants.length > 0
+      ? affordableRestaurants.slice(0, 3)
+      : taggedRestaurants.slice(0, 3);
 
     const recommendedHiddenGems = hiddenGems.slice(0, 3).map((g) => ({
       ...g,
@@ -928,6 +985,7 @@ export class RecommendationEngine {
       minRequiredBudget,
       shortfallAmount,
       suggestedActions,
+      noSuitableHotelWithinBudget,
     };
   }
 }

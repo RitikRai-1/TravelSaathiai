@@ -15,6 +15,8 @@ export const HotelsPage: React.FC = () => {
   const [maxPrice, setMaxPrice] = useState<number>(20000);
   const [searchQuery, setSearchQuery] = useState('');
 
+  const [minRating, setMinRating] = useState<number>(0);
+
   useEffect(() => {
     api.getCities().then((res) => {
       if (res.success) setCities(res.data);
@@ -26,6 +28,7 @@ export const HotelsPage: React.FC = () => {
     const params: Record<string, any> = {};
     if (selectedCity) params.city_id = selectedCity;
     if (maxPrice < 20000) params.max_price = maxPrice;
+    if (minRating > 0) params.min_rating = minRating;
     if (searchQuery) params.search = searchQuery;
 
     api.getHotels(params)
@@ -33,7 +36,20 @@ export const HotelsPage: React.FC = () => {
         if (res.success) setHotels(res.data);
       })
       .finally(() => setLoading(false));
-  }, [selectedCity, maxPrice, searchQuery]);
+  }, [selectedCity, maxPrice, minRating, searchQuery]);
+
+  const priceTiers = [
+    { label: 'All', value: 20000 },
+    { label: 'Under ₹2,500', value: 2500 },
+    { label: '₹2,500 – ₹5,000', value: 5000 },
+    { label: 'Above ₹5,000', value: 20000, min: 5001 },
+  ];
+
+  const ratingOptions = [
+    { label: 'All Ratings', value: 0 },
+    { label: '4.0+ ★', value: 4.0 },
+    { label: '4.5+ ★', value: 4.5 },
+  ];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
@@ -59,32 +75,68 @@ export const HotelsPage: React.FC = () => {
       </div>
 
       {/* Filter Bar */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row items-center gap-3">
-        <div className="relative flex-1 w-full">
-          <Search className="w-4 h-4 absolute left-3.5 top-3 text-slate-400" />
-          <input
-            type="text"
-            placeholder="Search hotel name, location, or facility..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-hidden focus:border-[#1B5E20]"
-          />
-        </div>
+      <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
+        <div className="flex flex-col sm:flex-row items-center gap-3">
+          <div className="relative flex-1 w-full">
+            <Search className="w-4 h-4 absolute left-3.5 top-3 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search hotel name, location, or facility..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-hidden focus:border-[#1B5E20]"
+            />
+          </div>
 
-        <div className="w-full sm:w-60">
-          <select
-            value={selectedCity}
-            onChange={(e) => setSelectedCity(e.target.value)}
-            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-hidden"
-          >
-            <option value="">All Cities</option>
+          <div className="w-full sm:w-60">
+            <select
+              value={selectedCity}
+              onChange={(e) => setSelectedCity(e.target.value)}
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-hidden"
+            >
+              <option value="">All Cities</option>
             {cities.map((c) => (
               <option key={c.id} value={c.id}>{c.name}</option>
             ))}
           </select>
         </div>
-      </div>
+        </div>
 
+        {/* Price Tier Buttons */}
+        <div className="flex flex-wrap items-center gap-2">
+          <Filter className="w-3.5 h-3.5 text-slate-400" />
+          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mr-1">Price:</span>
+          {priceTiers.map((tier, idx) => (
+            <button
+              key={idx}
+              onClick={() => setMaxPrice(tier.value)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${
+                maxPrice === tier.value
+                  ? 'bg-[#1B5E20] text-white shadow-sm'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              {tier.label}
+            </button>
+          ))}
+
+          <span className="text-slate-300 mx-1">|</span>
+          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mr-1">Rating:</span>
+          {ratingOptions.map((opt, idx) => (
+            <button
+              key={idx}
+              onClick={() => setMinRating(opt.value)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${
+                minRating === opt.value
+                  ? 'bg-amber-500 text-white shadow-sm'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      </div>
       {/* Hotels Grid */}
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
